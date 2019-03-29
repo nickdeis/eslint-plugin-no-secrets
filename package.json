@@ -8,6 +8,7 @@
   },
   "keywords": ["eslint", "eslint-plugin", "security", "secure", "secrets", "security", "lint", "eslintplugin"],
   "author": "Nick Deis <nickjdeis@gmail.com>",
+  "repository": "https://github.com/nickdeis/eslint-plugin-no-secrets",
   "license": "MIT",
   "devDependencies": {
     "eslint": "^5.15.3"
