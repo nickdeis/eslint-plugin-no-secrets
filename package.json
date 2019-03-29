@@ -1,0 +1,18 @@
+{
+  "name": "eslint-plugin-no-secrets",
+  "version": "0.1.0",
+  "description": "A eslint plugin to find strings that might be secrets/passwords",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/lib/rules/no-secrets.js"
+  },
+  "keywords": ["eslint", "eslint-plugin", "security", "secure", "secrets", "security", "lint", "eslintplugin"],
+  "author": "Nick Deis <nickjdeis@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.15.3"
+  },
+  "peerDependencies": {
+    "eslint": ">=3.0.0"
+  }
+}
