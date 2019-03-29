@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-no-secrets",
   "version": "0.1.0",
-  "description": "A eslint plugin to find strings that might be secrets/passwords",
+  "description": "An eslint plugin to find strings that might be secrets/passwords",
   "main": "index.js",
   "scripts": {
     "test": "node tests/lib/rules/no-secrets.js"
