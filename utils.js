@@ -1,4 +1,3 @@
-const { isPlainObject } = require("lodash");
 
 const MATH_LOG_2 = Math.log(2);
 /**
@@ -9,6 +8,10 @@ const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+
 const DEFAULT_TOLERANCE = 4;
 const DEFAULT_ADDTIONAL_REGEXES = {};
 
+function isPlainObject(obj) {
+  return typeof obj === 'object' && obj.constructor === Object;
+}
+
 function checkOptions({ tolerance, additionalRegexes }) {
   tolerance = tolerance || DEFAULT_TOLERANCE;
   if (typeof tolerance !== "number" || tolerance <= 0) {
@@ -18,6 +21,7 @@ function checkOptions({ tolerance, additionalRegexes }) {
   if (!isPlainObject(additionalRegexes)) {
     throw new Error("Expected additionalRegexes to be a plain object");
   }
+
   const compiledRegexes = {};
   for (const regexName in additionalRegexes) {
     if (additionalRegexes.hasOwnProperty(regexName)) {
