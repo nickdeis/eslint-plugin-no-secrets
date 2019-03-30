@@ -16,6 +16,15 @@ An eslint rule that searches for potential secrets/keys in code.
 }
 ```
 
+```js
+//Found a string with entropy 4.3 : "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva"
+const A_SECRET = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
+//Found a string that matches "AWS API Key" : "AKIAIUWUUQQN3GNUA88V"
+const AWS_TOKEN = "AKIAIUWUUQQN3GNUA88V";
+```
+
+## Config
+
 Decrease the tolerance for entropy
 
 ```json
