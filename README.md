@@ -53,12 +53,22 @@ Standard patterns can be found [here](./regexes.js)
 ```
 ## When it's really not a secret
 
-Then disable it with
+Either disable it with a comment
 ```javascript
 // Set of potential base64 characters
 // eslint-disable-next-line no-secrets/no-secrets
 const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 ```
+or use the `ignoreContent`
+```json
+{
+   "plugins":["no-secrets"],
+   "rules":{
+       "no-secrets/no-secrets":["error",{"ignoreContent":"^ABCD"}]
+   }
+}
+```
+
 This will tell future maintainers of the codebase that this suspicious string isn't an oversight
 
 ## Options
@@ -66,7 +76,8 @@ This will tell future maintainers of the codebase that this suspicious string is
 |Option|Description|Default|Type|
 |------|-----------|----------------|----|
 |tolerance|Maximum "randomness"/entropy allowed|`4`|`number`|
-|additionalRegexes|Object of additional patterns to check. Key is check name and value is corresponding pattern |`{}`|`{[regexCheckName:string]:string | RegExp}`|
+|additionalRegexes|Object of additional patterns to check. Key is check name and value is corresponding pattern |`{}`|```{[regexCheckName:string]:string | RegExp}```|
+|ignoreContent|Will ignore the *entire* string if matched. Expects either a pattern or an array of patterns. This option takes precedent over `additionalRegexes` and the default regular expressions|`[]`|```string | RegExp | (string|RegExp)[]```|
 
 ## Acknowledgements
 

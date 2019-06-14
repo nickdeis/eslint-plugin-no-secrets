@@ -38,11 +38,10 @@ module.exports = {
         }
       },
       create(context) {
-        const { tolerance, additionalRegexes } = checkOptions(context.options[0] || {});
+        const { tolerance, additionalRegexes, ignoreContent } = checkOptions(context.options[0] || {});
         const sourceCode = context.getSourceCode();
         const comments = sourceCode.getAllComments();
         const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
-
         function entropyReport(data, node) {
           //Easier to read numbers
           data.entropy = Math.round(data.entropy * 100) / 100;
@@ -61,8 +60,16 @@ module.exports = {
           });
         }
 
+        function shouldIgnore(value){
+          for(let i=0; i < ignoreContent.length;i++){
+            if(value.match(ignoreContent[i])) return true;
+          }
+          return false;
+        }
+
         function checkString(value,node){
             if (!isNonEmptyString(value)) return;
+            if(shouldIgnore(value)) return;
             checkEntropy(value, tolerance).forEach(payload => {
               entropyReport(payload, node);
             });

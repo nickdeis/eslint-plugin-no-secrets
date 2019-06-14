@@ -10,6 +10,10 @@ const STRING_TEST = `
 const NOT_A_SECRET = "I'm not a secret, I think";
 `;
 
+const IMPORT_REQUIRE_TEST = `
+const webpackFriendlyConsole = require('./config/webpack/webpackFriendlyConsole')
+`;
+
 const TEMPLATE_TEST = "const NOT_A_SECRET = `A template that isn't a secret. ${1+1} = 2`";
 
 const SECRET_STRING_TEST = `
@@ -26,6 +30,12 @@ const VAULT = {
 }
 `;
 
+const CSS_CLASSNAME = `
+const CSS_CLASSNAME = "hey-it-s-a-css-class-not-a-secret and-neither-this-one";
+`
+const IGNORE_CONTENT_TEST = `
+const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+`
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
@@ -59,6 +69,22 @@ ruleTester.run("no-secrets", rule, {
     {
       code: TEMPLATE_TEST,
       options: []
+    },
+    {
+      code:IMPORT_REQUIRE_TEST,
+      options: []
+    },
+    {
+      code:CSS_CLASSNAME,
+      options:[]
+    },
+    {
+      code:IGNORE_CONTENT_TEST,
+      options:[{ignoreContent:[/^ABC/]}]
+    },
+    {
+      code:IGNORE_CONTENT_TEST,
+      options:[{ignoreContent:"^ABC"}]
     }
   ].concat(REGEX_TESTS),
   invalid: [
