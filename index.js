@@ -1,4 +1,4 @@
-const { shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH } = require("./utils");
+const { shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString } = require("./utils");
 const STANDARD_PATTERNS = require("./regexes");
 
 function isNonEmptyString(value) {
@@ -16,12 +16,14 @@ function checkEntropy(value, tolerance) {
 }
 
 function checkRegexes(value, patterns) {
-  return Object.keys(patterns).map(name => {
+  return Object.keys(patterns)
+    .map(name => {
       const pattern = patterns[name];
       const m = value.match(pattern);
       if (!m || !m[0]) return m;
       return { name, match: m[0] };
-    }).filter(payload => !!payload);
+    })
+    .filter(payload => !!payload);
 }
 
 module.exports = {
@@ -38,7 +40,7 @@ module.exports = {
         }
       },
       create(context) {
-        const { tolerance, additionalRegexes, ignoreContent } = checkOptions(context.options[0] || {});
+        const { tolerance, additionalRegexes, ignoreContent, ignoreModules } = checkOptions(context.options[0] || {});
         const sourceCode = context.getSourceCode();
         const comments = sourceCode.getAllComments();
         const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
@@ -60,33 +62,36 @@ module.exports = {
           });
         }
 
-        function shouldIgnore(value){
-          for(let i=0; i < ignoreContent.length;i++){
-            if(value.match(ignoreContent[i])) return true;
+        function shouldIgnore(value) {
+          for (let i = 0; i < ignoreContent.length; i++) {
+            if (value.match(ignoreContent[i])) return true;
           }
           return false;
         }
 
-        function checkString(value,node){
-            if (!isNonEmptyString(value)) return;
-            if(shouldIgnore(value)) return;
-            checkEntropy(value, tolerance).forEach(payload => {
-              entropyReport(payload, node);
-            });
-            checkRegexes(value, allPatterns).forEach(payload => {
-                patternReport(payload,node);
-            });
+        function checkString(value, node) {
+          if (!isNonEmptyString(value)) return;
+          if (ignoreModules && isModulePathString(node)) {
+            return;
+          }
+          if (shouldIgnore(value)) return;
+          checkEntropy(value, tolerance).forEach(payload => {
+            entropyReport(payload, node);
+          });
+          checkRegexes(value, allPatterns).forEach(payload => {
+            patternReport(payload, node);
+          });
         }
 
         return {
           Literal(node) {
             const { value } = node;
-            checkString(value,node);
+            checkString(value, node);
           },
           TemplateElement(node) {
             if (!node.value) return;
             const value = node.value.cooked;
-            checkString(value,node);
+            checkString(value, node);
           }
         };
       }

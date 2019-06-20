@@ -32,10 +32,14 @@ const VAULT = {
 
 const CSS_CLASSNAME = `
 const CSS_CLASSNAME = "hey-it-s-a-css-class-not-a-secret and-neither-this-one";
-`
+`;
 const IGNORE_CONTENT_TEST = `
 const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-`
+`;
+
+const IMPORT_TEST = `
+import {x} from "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
+`;
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
@@ -71,20 +75,25 @@ ruleTester.run("no-secrets", rule, {
       options: []
     },
     {
-      code:IMPORT_REQUIRE_TEST,
+      code: IMPORT_REQUIRE_TEST,
       options: []
     },
     {
-      code:CSS_CLASSNAME,
-      options:[]
+      code: CSS_CLASSNAME,
+      options: []
     },
     {
-      code:IGNORE_CONTENT_TEST,
-      options:[{ignoreContent:[/^ABC/]}]
+      code: IGNORE_CONTENT_TEST,
+      options: [{ ignoreContent: [/^ABC/] }]
     },
     {
-      code:IGNORE_CONTENT_TEST,
-      options:[{ignoreContent:"^ABC"}]
+      code: IGNORE_CONTENT_TEST,
+      options: [{ ignoreContent: "^ABC" }]
+    },
+    {
+      code: IMPORT_TEST,
+      options: [{ ignoreModules: true }],
+      parserOptions: { sourceType: "module", ecmaVersion: 7 }
     }
   ].concat(REGEX_TESTS),
   invalid: [

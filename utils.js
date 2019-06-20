@@ -1,4 +1,3 @@
-
 const MATH_LOG_2 = Math.log(2);
 /**
  * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters, 
@@ -9,10 +8,14 @@ const DEFAULT_TOLERANCE = 4;
 const DEFAULT_ADDTIONAL_REGEXES = {};
 
 function isPlainObject(obj) {
-  return typeof obj === 'object' && obj.constructor === Object;
+  return typeof obj === "object" && obj.constructor === Object;
 }
 
-function checkOptions({ tolerance, additionalRegexes, ignoreContent }) {
+function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModules }) {
+  ignoreModules = ignoreModules || true;
+  if (typeof ignoreModules !== "boolean") {
+    throw new Error("The option 'ignoreModules' must be boolean");
+  }
   tolerance = tolerance || DEFAULT_TOLERANCE;
   if (typeof tolerance !== "number" || tolerance <= 0) {
     throw new Error("The option tolerance must be a postive (eg greater than zero) number");
@@ -40,24 +43,24 @@ function checkOptions({ tolerance, additionalRegexes, ignoreContent }) {
 
   ignoreContent = ignoreContent || [];
 
-  if(!Array.isArray(ignoreContent)){
-    if(typeof ignoreContent === "string" || ignoreContent instanceof RegExp){
+  if (!Array.isArray(ignoreContent)) {
+    if (typeof ignoreContent === "string" || ignoreContent instanceof RegExp) {
       ignoreContent = [ignoreContent];
-    }else{
+    } else {
       throw new Error("Expected 'ignoreContent' to be an a array, a string, or a RegExp");
     }
   }
 
   const compiledIgnoreContent = [];
-  for(let i=0; i < ignoreContent.length;i++){
-    try{
-      compiledIgnoreContent[i] = ignoreContent[i] instanceof RegExp ? ignoreContent[i]:new RegExp(String(ignoreContent[i]));
-    }catch(e){
-      throw new Error("Failed to compiled the regexp "+ignoreContent[i]);
+  for (let i = 0; i < ignoreContent.length; i++) {
+    try {
+      compiledIgnoreContent[i] =
+        ignoreContent[i] instanceof RegExp ? ignoreContent[i] : new RegExp(String(ignoreContent[i]));
+    } catch (e) {
+      throw new Error("Failed to compiled the regexp " + ignoreContent[i]);
     }
-    
   }
-  return { tolerance, additionalRegexes: compiledRegexes,ignoreContent:compiledIgnoreContent };
+  return { tolerance, additionalRegexes: compiledRegexes, ignoreContent: compiledIgnoreContent, ignoreModules };
 }
 
 /**
@@ -76,10 +79,35 @@ function shannonEntropy(str) {
   return entropy;
 }
 
+const MODULE_FUNCTIONS = ["import", "require"];
 
+/**
+ * Used to detect "import()" and "require()"
+ * Inspired by https://github.com/benmosher/eslint-plugin-import/blob/45bfe472f38ef790c11efe45ffc59808c67a3f94/src/core/staticRequire.js
+ * @param {*} node 
+ */
+function isStaticImportOrRequire(node) {
+  return (
+    node &&
+    node.callee &&
+    node.callee.type === "Identifier" &&
+    MODULE_FUNCTIONS.indexOf(node.callee.name) !== -1 &&
+    node.arguments.length === 1 &&
+    node.arguments[0].type === "Literal" &&
+    typeof node.arguments[0].value === "string"
+  );
+}
+
+function isImportString(node) {
+  return node && node.parent && node.parent.type === "ImportDeclaration";
+}
+
+function isModulePathString(node) {
+  return isStaticImportOrRequire(node.parent) || isImportString(node) || false;
+}
 
 const HIGH_ENTROPY = "HIGH_ENTROPY";
 
 const PATTERN_MATCH = "PATTERN_MATCH";
 
-module.exports = { shannonEntropy, checkOptions,HIGH_ENTROPY,PATTERN_MATCH };
+module.exports = { shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString };
