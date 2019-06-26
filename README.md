@@ -53,18 +53,32 @@ Standard patterns can be found [here](./regexes.js)
 ```
 ## When it's really not a secret
 
-Either disable it with a comment
+### 1. Either disable it with a comment
+
 ```javascript
 // Set of potential base64 characters
 // eslint-disable-next-line no-secrets/no-secrets
 const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 ```
-or use the `ignoreContent`
+
+### 2. use the `ignoreContent` to ignore certain content
+
 ```json
 {
    "plugins":["no-secrets"],
    "rules":{
        "no-secrets/no-secrets":["error",{"ignoreContent":"^ABCD"}]
+   }
+}
+```
+
+### 3. Or use `ignoreIdentifiers` to ignore certain variable/property names
+
+```json
+{
+   "plugins":["no-secrets"],
+   "rules":{
+       "no-secrets/no-secrets":["error",{"ignoreIdentifiers":["BASE64_CHARS"]}]
    }
 }
 ```
@@ -79,6 +93,7 @@ This will tell future maintainers of the codebase that this suspicious string is
 |additionalRegexes|Object of additional patterns to check. Key is check name and value is corresponding pattern |`{}`|{\[regexCheckName:string]:string \| RegExp}|
 |ignoreContent|Will ignore the *entire* string if matched. Expects either a pattern or an array of patterns. This option takes precedent over `additionalRegexes` and the default regular expressions|`[]`|string \| RegExp \| (string\|RegExp)[]|
 |ignoreModules|Ignores strings that are an argument in `import()` and `require()` or is the path in an `import` statement.|`true`|`boolean`|
+|ignoreIdentifiers|Ignores the values of properties and variables that match a pattern or an array of patterns. |`[]`|string \| RegExp \| (string\|RegExp)[]|
 
 ## Acknowledgements
 

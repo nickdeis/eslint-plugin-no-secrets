@@ -11,7 +11,27 @@ function isPlainObject(obj) {
   return typeof obj === "object" && obj.constructor === Object;
 }
 
-function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModules }) {
+function compileListOfPatterns(patterns = [], name) {
+  if (!Array.isArray(patterns)) {
+    if (typeof patterns === "string" || patterns instanceof RegExp) {
+      patterns = [patterns];
+    } else {
+      throw new Error(`Expected '${name}' to be an a array, a string, or a RegExp`);
+    }
+  }
+
+  const compiledPatterns = [];
+  for (let i = 0; i < patterns.length; i++) {
+    try {
+      compiledPatterns[i] = patterns[i] instanceof RegExp ? patterns[i] : new RegExp(String(patterns[i]));
+    } catch (e) {
+      throw new Error("Failed to compiled the regexp " + patterns[i]);
+    }
+  }
+  return compiledPatterns;
+}
+
+function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers }) {
   ignoreModules = ignoreModules || true;
   if (typeof ignoreModules !== "boolean") {
     throw new Error("The option 'ignoreModules' must be boolean");
@@ -41,26 +61,13 @@ function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModul
     }
   }
 
-  ignoreContent = ignoreContent || [];
-
-  if (!Array.isArray(ignoreContent)) {
-    if (typeof ignoreContent === "string" || ignoreContent instanceof RegExp) {
-      ignoreContent = [ignoreContent];
-    } else {
-      throw new Error("Expected 'ignoreContent' to be an a array, a string, or a RegExp");
-    }
-  }
-
-  const compiledIgnoreContent = [];
-  for (let i = 0; i < ignoreContent.length; i++) {
-    try {
-      compiledIgnoreContent[i] =
-        ignoreContent[i] instanceof RegExp ? ignoreContent[i] : new RegExp(String(ignoreContent[i]));
-    } catch (e) {
-      throw new Error("Failed to compiled the regexp " + ignoreContent[i]);
-    }
-  }
-  return { tolerance, additionalRegexes: compiledRegexes, ignoreContent: compiledIgnoreContent, ignoreModules };
+  return {
+    tolerance,
+    additionalRegexes: compiledRegexes,
+    ignoreContent: compileListOfPatterns(ignoreContent),
+    ignoreModules,
+    ignoreIdentifiers:compileListOfPatterns(ignoreIdentifiers)
+  };
 }
 
 /**
@@ -106,8 +113,38 @@ function isModulePathString(node) {
   return isStaticImportOrRequire(node.parent) || isImportString(node) || false;
 }
 
+const VARORPROP = ["AssignmentExpression", "Property", "VariableDeclarator"];
+
+function getPropertyName(node) {
+  return node.parent.key && node.parent.key.type === "Identifier" && node.parent.key.name;
+}
+
+function getIdentifierName(node) {
+  if (!node || !node.parent) return false;
+  switch (node.parent.type) {
+    case "VariableDeclarator":
+      return getVarName(node);
+    case "AssignmentExpression":
+      return getAssignmentName(node);
+    case "Property":
+      return getPropertyName(node);
+    default:
+      return false;
+  }
+}
+
+function getVarName(node) {
+  return node.parent.id && node.parent.id.name;
+}
+
+function getAssignmentName(node) {
+  return (
+    node.parent.left && node.parent.property && node.parent.property.type === "Identifier" && node.parent.property.name
+  );
+}
+
 const HIGH_ENTROPY = "HIGH_ENTROPY";
 
 const PATTERN_MATCH = "PATTERN_MATCH";
 
-module.exports = { shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString };
+module.exports = { getIdentifierName, shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString };

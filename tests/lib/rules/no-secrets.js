@@ -40,6 +40,23 @@ const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345
 const IMPORT_TEST = `
 import {x} from "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
 `;
+
+const IGNORE_VAR_TEST = `const NOT_A_SECRET = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";`;
+
+const IGNORE_FIELD_TEST = `
+const VAULT = {
+  NOT_A_SECRET:"ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva"
+};
+
+`;
+
+const IGNORE_CLASS_FIELD_TEST = `
+class A {
+  constructor(){
+    this.secret = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
+  }
+}
+`;
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
@@ -91,9 +108,19 @@ ruleTester.run("no-secrets", rule, {
       options: [{ ignoreContent: "^ABC" }]
     },
     {
+      //Property
+      code: IGNORE_FIELD_TEST,
+      options: [{ ignoreIdentifiers:[/NOT_A_SECRET/] }]
+    },
+    {
       code: IMPORT_TEST,
       options: [{ ignoreModules: true }],
       parserOptions: { sourceType: "module", ecmaVersion: 7 }
+    },
+    {
+      //VariableDeclarator
+      code: IGNORE_VAR_TEST,
+      options: [{ignoreIdentifiers:"NOT_A_SECRET"}]
     }
   ].concat(REGEX_TESTS),
   invalid: [

@@ -1,4 +1,11 @@
-const { shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString } = require("./utils");
+const {
+  getIdentifierName,
+  shannonEntropy,
+  checkOptions,
+  HIGH_ENTROPY,
+  PATTERN_MATCH,
+  isModulePathString
+} = require("./utils");
 const STANDARD_PATTERNS = require("./regexes");
 
 function isNonEmptyString(value) {
@@ -26,6 +33,13 @@ function checkRegexes(value, patterns) {
     .filter(payload => !!payload);
 }
 
+function shouldIgnore(value,toIgnore) {
+  for (let i = 0; i < toIgnore.length; i++) {
+    if (value.match(toIgnore[i])) return true;
+  }
+  return false;
+}
+
 module.exports = {
   rules: {
     "no-secrets": {
@@ -40,7 +54,7 @@ module.exports = {
         }
       },
       create(context) {
-        const { tolerance, additionalRegexes, ignoreContent, ignoreModules } = checkOptions(context.options[0] || {});
+        const { tolerance, additionalRegexes, ignoreContent, ignoreModules,ignoreIdentifiers } = checkOptions(context.options[0] || {});
         const sourceCode = context.getSourceCode();
         const comments = sourceCode.getAllComments();
         const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
@@ -61,20 +75,14 @@ module.exports = {
             messageId: PATTERN_MATCH
           });
         }
-
-        function shouldIgnore(value) {
-          for (let i = 0; i < ignoreContent.length; i++) {
-            if (value.match(ignoreContent[i])) return true;
-          }
-          return false;
-        }
-
         function checkString(value, node) {
+          const idName = getIdentifierName(node);
+          if (idName && shouldIgnore(idName,ignoreIdentifiers)) return;
           if (!isNonEmptyString(value)) return;
           if (ignoreModules && isModulePathString(node)) {
             return;
           }
-          if (shouldIgnore(value)) return;
+          if (shouldIgnore(value,ignoreContent)) return;
           checkEntropy(value, tolerance).forEach(payload => {
             entropyReport(payload, node);
           });
