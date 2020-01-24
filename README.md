@@ -1,3 +1,5 @@
+
+[![Build Status](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets.svg)](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets)
 # eslint-plugin-no-secrets
 
 An eslint rule that searches for potential secrets/keys in code.
