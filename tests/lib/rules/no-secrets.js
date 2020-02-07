@@ -1,4 +1,4 @@
-const { RuleTester:RuleTester6 } = require("eslint6"),
+const RuleTester6 = require("eslint6").RuleTester,
 RuleTester5 = require("eslint5/lib/testers/rule-tester");
   rule = require("../../..").rules["no-secrets"],
   { HIGH_ENTROPY, PATTERN_MATCH } = require("../../../utils"),
