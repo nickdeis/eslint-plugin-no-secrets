@@ -20,9 +20,11 @@
   "repository": "https://github.com/nickdeis/eslint-plugin-no-secrets",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^5.15.3"
+    "eslint5": "npm:eslint@^5.16.0",
+    "eslint6": "npm:eslint@^6.8.0"
   },
   "peerDependencies": {
     "eslint": ">=3.0.0"
-  }
+  },
+  "dependencies": {}
 }

@@ -1,10 +1,15 @@
-const RuleTester = require("eslint/lib/testers/rule-tester"),
+const { RuleTester:RuleTester6 } = require("eslint6"),
+RuleTester5 = require("eslint5/lib/testers/rule-tester");
   rule = require("../../..").rules["no-secrets"],
   { HIGH_ENTROPY, PATTERN_MATCH } = require("../../../utils"),
   P = require("../../../regexes"),
   _ = require("lodash");
 
-const ruleTester = new RuleTester({ env: { es6: true } });
+const RULE_TESTER_CONFIG = { env: { es6: true } }
+
+const ruleTester6 = new RuleTester6(RULE_TESTER_CONFIG);
+const ruleTester5 = new RuleTester5(RULE_TESTER_CONFIG);
+const RULE_TESTERS = [ruleTester6,ruleTester5];
 
 const STRING_TEST = `
 const NOT_A_SECRET = "I'm not a secret, I think";
@@ -81,7 +86,7 @@ const PATTERN_MATCH_TESTS = [P["Google (GCP) Service-account"], P["RSA private k
   errors: [PATTERN_MATCH_MSG]
 }));
 
-ruleTester.run("no-secrets", rule, {
+const TESTS = {
   valid: [
     {
       code: STRING_TEST,
@@ -147,4 +152,9 @@ ruleTester.run("no-secrets", rule, {
       errors: [HIGH_ENTROPY_MSG, PATTERN_MATCH_MSG]
     }
   ].concat(PATTERN_MATCH_TESTS)
+};
+
+
+RULE_TESTERS.forEach(ruleTester => {
+  ruleTester.run("no-secrets", rule, TESTS);
 });
