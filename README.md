@@ -1,3 +1,10 @@
+[![Build Status](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets.svg)](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets)
+
+
+# eslint-plugin-no-secrets
+
+An eslint rule that searches for potential secrets/keys in code.
+
 <!-- vscode-markdown-toc -->
 * 1. [Usage](#Usage)
 * 2. [Config](#Config)
@@ -14,12 +21,6 @@
 	autoSave=true
 	/vscode-markdown-toc-config -->
 <!-- /vscode-markdown-toc -->
-[![Build Status](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets.svg)](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets)
-
-
-# eslint-plugin-no-secrets
-
-An eslint rule that searches for potential secrets/keys in code.
 
 ##  1. <a name='Usage'></a>Usage
 
