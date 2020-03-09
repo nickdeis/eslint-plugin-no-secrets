@@ -25,13 +25,17 @@ const SECRET_STRING_TEST = `
 const A_SECRET = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
 `;
 
+const SECRET_LOWERCASE_STRING = `
+const A_LOWERCASE_SECRET = "zwvtjpqsdhwrgl204hc51ycsritmizn8b=/p9uyex7xu6kkagqfm3fj+oobldneva";
+`;
+
 const A_BEARER_TOKEN = `
 const A_BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAMLheAAAAAAA0%2BuSeid%2BULvsea4JtiGRiSDSJSI%3DEUifiRBkKG5E2XzMDjRfl76ZC9Ub0wnz4XsNiRVBChTYbJcE3F";
 `;
 
 const IN_AN_OBJECT = `
 const VAULT = {
-  token:"BAAAAAAAAAAAAAAAAAAAAMLheAAAAAAA0%2BuSeid%2BULvsea4JtiGRiSDSJSI%3DEUifiRBkKG5E2XzMDjRfl76ZC9Ub0wnz4XsNiRVBChTYbJcE3F"
+  token:"baaaaaaaaaaaaaaaaaaaamlheaaaaaaa0%2buseid%2bulvsea4jtigrisdsjsi%3deuifirbkkg5e2xzmdjrfl76zc9ub0wnz4xsnirvbchtybjce3f"
 }
 `;
 
@@ -62,6 +66,10 @@ class A {
   }
 }
 `;
+
+const IS_REALLY_A_NAMESPACE_TEST = `
+const NAMESPACE_CLASSNAME = 'Validation.JSONSchemaValidationUtilsImplFactory';
+`
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
@@ -126,6 +134,14 @@ const TESTS = {
       //VariableDeclarator
       code: IGNORE_VAR_TEST,
       options: [{ignoreIdentifiers:"NOT_A_SECRET"}]
+    },
+    {
+      code:IS_REALLY_A_NAMESPACE_TEST,
+      options: [{additionalDelimiters:["."]}]
+    },
+    {
+      code:IS_REALLY_A_NAMESPACE_TEST,
+      options: [{ignoreCase:true}]
     }
   ].concat(REGEX_TESTS),
   invalid: [
@@ -150,6 +166,10 @@ const TESTS = {
       `,
       options: [{ additionalRegexes: { "Basic Auth": "Authorization: Basic [A-Za-z0-9+/=]*" } }],
       errors: [HIGH_ENTROPY_MSG, PATTERN_MATCH_MSG]
+    },
+    {
+      code:SECRET_LOWERCASE_STRING,
+      errors:[HIGH_ENTROPY_MSG]
     }
   ].concat(PATTERN_MATCH_TESTS)
 };

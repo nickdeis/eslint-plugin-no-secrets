@@ -12,16 +12,6 @@ function isNonEmptyString(value) {
   return value && typeof value === "string";
 }
 
-function checkEntropy(value, tolerance) {
-  const tokens = value.split(" ");
-  return tokens
-    .map(token => {
-      const entropy = shannonEntropy(token);
-      return { token, entropy };
-    })
-    .filter(payload => tolerance <= payload.entropy);
-}
-
 function checkRegexes(value, patterns) {
   return Object.keys(patterns)
     .map(name => {
@@ -33,7 +23,7 @@ function checkRegexes(value, patterns) {
     .filter(payload => !!payload);
 }
 
-function shouldIgnore(value,toIgnore) {
+function shouldIgnore(value, toIgnore) {
   for (let i = 0; i < toIgnore.length; i++) {
     if (value.match(toIgnore[i])) return true;
   }
@@ -54,10 +44,41 @@ module.exports = {
         }
       },
       create(context) {
-        const { tolerance, additionalRegexes, ignoreContent, ignoreModules,ignoreIdentifiers } = checkOptions(context.options[0] || {});
+        const {
+          tolerance,
+          additionalRegexes,
+          ignoreContent,
+          ignoreModules,
+          ignoreIdentifiers,
+          additionalDelimiters,
+          ignoreCase
+        } = checkOptions(context.options[0] || {});
         const sourceCode = context.getSourceCode();
         const comments = sourceCode.getAllComments();
         const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
+        const allDelimiters = additionalDelimiters.concat([" "]);
+
+        function splitIntoTokens(value) {
+          let tokens = [value];
+          allDelimiters.forEach(delimiter => {
+            tokens = tokens.map(token => token.split(delimiter));
+            //flatten
+            tokens = [].concat.apply([],tokens);
+          });
+          return tokens;
+        }
+
+        function checkEntropy(value) {
+          value = ignoreCase ? value.toLowerCase():value;
+          const tokens = splitIntoTokens(value);
+          return tokens
+            .map(token => {
+              const entropy = shannonEntropy(token);
+              return { token, entropy };
+            })
+            .filter(payload => tolerance <= payload.entropy);
+        }
+
         function entropyReport(data, node) {
           //Easier to read numbers
           data.entropy = Math.round(data.entropy * 100) / 100;
@@ -77,13 +98,13 @@ module.exports = {
         }
         function checkString(value, node) {
           const idName = getIdentifierName(node);
-          if (idName && shouldIgnore(idName,ignoreIdentifiers)) return;
+          if (idName && shouldIgnore(idName, ignoreIdentifiers)) return;
           if (!isNonEmptyString(value)) return;
           if (ignoreModules && isModulePathString(node)) {
             return;
           }
-          if (shouldIgnore(value,ignoreContent)) return;
-          checkEntropy(value, tolerance).forEach(payload => {
+          if (shouldIgnore(value, ignoreContent)) return;
+          checkEntropy(value).forEach(payload => {
             entropyReport(payload, node);
           });
           checkRegexes(value, allPatterns).forEach(payload => {

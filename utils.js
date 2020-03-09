@@ -1,6 +1,6 @@
 const MATH_LOG_2 = Math.log(2);
 /**
- * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters, 
+ * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters,
  * which raise a lot of false postives and aren't usually in passwords/secrets
  */
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=!|*^@~`$%+?\"'_<>".split("");
@@ -31,11 +31,25 @@ function compileListOfPatterns(patterns = [], name) {
   return compiledPatterns;
 }
 
-function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers }) {
-  ignoreModules = ignoreModules || true;
-  if (typeof ignoreModules !== "boolean") {
-    throw new Error("The option 'ignoreModules' must be boolean");
+function booleanOption(value,name,defaultValue){
+  value = value || defaultValue;
+  if(typeof value !== "boolean"){
+    throw new Error(`The option '${name}' must be boolean`);
   }
+  return value;
+}
+
+function checkOptions({
+  tolerance,
+  additionalRegexes,
+  ignoreContent,
+  ignoreModules,
+  ignoreIdentifiers,
+  additionalDelimiters,
+  ignoreCase
+}) {
+  ignoreModules = booleanOption(ignoreModules,'ignoreModules',true);
+  ignoreCase = booleanOption(ignoreCase,'ignoreCase',false);
   tolerance = tolerance || DEFAULT_TOLERANCE;
   if (typeof tolerance !== "number" || tolerance <= 0) {
     throw new Error("The option tolerance must be a postive (eg greater than zero) number");
@@ -66,13 +80,15 @@ function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModul
     additionalRegexes: compiledRegexes,
     ignoreContent: compileListOfPatterns(ignoreContent),
     ignoreModules,
-    ignoreIdentifiers:compileListOfPatterns(ignoreIdentifiers)
+    ignoreIdentifiers: compileListOfPatterns(ignoreIdentifiers),
+    additionalDelimiters: compileListOfPatterns(additionalDelimiters),
+    ignoreCase
   };
 }
 
 /**
  * From https://github.com/dxa4481/truffleHog/blob/dev/truffleHog/truffleHog.py#L85
- * @param {*} str 
+ * @param {*} str
  */
 function shannonEntropy(str) {
   if (!str) return 0;
@@ -91,7 +107,7 @@ const MODULE_FUNCTIONS = ["import", "require"];
 /**
  * Used to detect "import()" and "require()"
  * Inspired by https://github.com/benmosher/eslint-plugin-import/blob/45bfe472f38ef790c11efe45ffc59808c67a3f94/src/core/staticRequire.js
- * @param {*} node 
+ * @param {*} node
  */
 function isStaticImportOrRequire(node) {
   return (
