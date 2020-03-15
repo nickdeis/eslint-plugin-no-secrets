@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/lib/rules/no-secrets.js && mocha \"staging/**/*.spec.js\"",
-    "test:staging":"mocha \"staging/**/*.spec.js\""
+    "test:staging": "mocha \"staging/**/*.spec.js\""
   },
   "keywords": [
     "eslint",
