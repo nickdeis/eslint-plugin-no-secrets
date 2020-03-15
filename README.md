@@ -3,16 +3,17 @@
 
 # eslint-plugin-no-secrets
 
-An eslint rule that searches for potential secrets/keys in code.
+An eslint rule that searches for potential secrets/keys in code and JSON files.
 
 <!-- vscode-markdown-toc -->
 * 1. [Usage](#Usage)
+	* 1.1. [Include JSON files](#IncludeJSONfiles)
 * 2. [Config](#Config)
 * 3. [When it's really not a secret](#Whenitsreallynotasecret)
-	* 3.1. [1. Either disable it with a comment](#Eitherdisableitwithacomment)
-	* 3.2. [2. use the `ignoreContent` to ignore certain content](#usetheignoreContenttoignorecertaincontent)
-	* 3.3. [3. Use `ignoreIdentifiers` to ignore certain variable/property names](#UseignoreIdentifierstoignorecertainvariablepropertynames)
-	* 3.4. [4. Use `additionalDelimiters` to further split up tokens](#UseadditionalDelimiterstofurthersplituptokens)
+	* 3.1. [ Either disable it with a comment](#Eitherdisableitwithacomment)
+	* 3.2. [ use the `ignoreContent` to ignore certain content](#usetheignoreContenttoignorecertaincontent)
+	* 3.3. [ Use `ignoreIdentifiers` to ignore certain variable/property names](#UseignoreIdentifierstoignorecertainvariablepropertynames)
+	* 3.4. [ Use `additionalDelimiters` to further split up tokens](#UseadditionalDelimiterstofurthersplituptokens)
 * 4. [Options](#Options)
 * 5. [Acknowledgements](#Acknowledgements)
 
@@ -42,6 +43,16 @@ const A_SECRET = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDN
 //Found a string that matches "AWS API Key" : "AKIAIUWUUQQN3GNUA88V"
 const AWS_TOKEN = "AKIAIUWUUQQN3GNUA88V";
 ```
+
+###  1.1. <a name='IncludeJSONfiles'></a>Include JSON files
+
+If you want to include JSON files, either us the `--ext` flag from the command line
+
+`eslint . --ext .json,.js`
+
+or run them on individual JSON files
+
+`eslint config.json`
 
 ##  2. <a name='Config'></a>Config
 
@@ -73,7 +84,7 @@ Standard patterns can be found [here](./regexes.js)
 ```
 ##  3. <a name='Whenitsreallynotasecret'></a>When it's really not a secret
 
-###  3.1. <a name='Eitherdisableitwithacomment'></a>1. Either disable it with a comment
+###  3.1. <a name='Eitherdisableitwithacomment'></a> Either disable it with a comment
 
 ```javascript
 // Set of potential base64 characters
