@@ -63,13 +63,13 @@ module.exports = {
           allDelimiters.forEach(delimiter => {
             tokens = tokens.map(token => token.split(delimiter));
             //flatten
-            tokens = [].concat.apply([],tokens);
+            tokens = [].concat.apply([], tokens);
           });
           return tokens;
         }
 
         function checkEntropy(value) {
-          value = ignoreCase ? value.toLowerCase():value;
+          value = ignoreCase ? value.toLowerCase() : value;
           const tokens = splitIntoTokens(value);
           return tokens
             .map(token => {
@@ -123,6 +123,16 @@ module.exports = {
             checkString(value, node);
           }
         };
+      }
+    }
+  },
+  processors: {
+    ".json": {
+      preprocess(text) {
+        return [`var json = ${text}`];
+      },
+      postprocess(messages, fileName) {
+        return messages[0];
       }
     }
   }

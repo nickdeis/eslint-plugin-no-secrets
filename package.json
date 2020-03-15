@@ -1,10 +1,11 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "0.5.4",
+  "version": "0.6.4",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "index.js",
   "scripts": {
-    "test": "node tests/lib/rules/no-secrets.js"
+    "test": "node tests/lib/rules/no-secrets.js && mocha \"staging/**/*.spec.js\"",
+    "test:staging":"mocha \"staging/**/*.spec.js\""
   },
   "keywords": [
     "eslint",
@@ -20,8 +21,10 @@
   "repository": "https://github.com/nickdeis/eslint-plugin-no-secrets",
   "license": "MIT",
   "devDependencies": {
+    "eslint-plugin-self": "^1.2.0",
     "eslint5": "npm:eslint@^5.16.0",
-    "eslint6": "npm:eslint@^6.8.0"
+    "eslint6": "npm:eslint@^6.8.0",
+    "mocha": "^7.1.0"
   },
   "peerDependencies": {
     "eslint": ">=3.0.0"
@@ -29,6 +32,6 @@
   "dependencies": {},
   "engines": {
     "npm": ">=6.9.0",
-    "node":">=10.0.0"
+    "node": ">=10.0.0"
   }
 }
