@@ -1,5 +1,4 @@
 const RuleTester6 = require("eslint6").RuleTester,
-RuleTester5 = require("eslint5/lib/testers/rule-tester");
   rule = require("../../..").rules["no-secrets"],
   { HIGH_ENTROPY, PATTERN_MATCH } = require("../../../utils"),
   P = require("../../../regexes"),
@@ -8,8 +7,7 @@ RuleTester5 = require("eslint5/lib/testers/rule-tester");
 const RULE_TESTER_CONFIG = { env: { es6: true } }
 
 const ruleTester6 = new RuleTester6(RULE_TESTER_CONFIG);
-const ruleTester5 = new RuleTester5(RULE_TESTER_CONFIG);
-const RULE_TESTERS = [ruleTester6,ruleTester5];
+const RULE_TESTERS = [ruleTester6];
 
 const STRING_TEST = `
 const NOT_A_SECRET = "I'm not a secret, I think";
