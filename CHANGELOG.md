@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.6.9
+### Patch
+ - Add eslint 7 unit testing
 ## 0.6.8
 ### Patch
  - Security updates
