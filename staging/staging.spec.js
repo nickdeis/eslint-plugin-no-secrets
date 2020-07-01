@@ -1,10 +1,34 @@
 const exec = require('util').promisify(require('child_process').execFile);
-const CLIEngine = require("eslint6").CLIEngine;
+const ESLint = require("eslint7").ESLint;
 const assert = require('assert');
 
+const WORKING_CONFIG = {
+    baseConfig:{
+        "plugins": [
+            "self"
+          ],
+          "rules": {
+            "self/no-secrets": "error"
+          }
+    },
+    extensions:['.js','.json'] 
+}
 
-const TESTS = {
-    './staging.config.js':[
+const BUGGED_CONFIG = {
+    baseConfig:{
+        "plugins": [
+            "self",
+            "json",
+          ],
+          "rules": {
+            "self/no-secrets": "error",
+            "json/undefined":"error"
+          }
+    },
+    extensions:['.js','.json']
+}
+
+const TESTS = [
         {
             name:'Should not detect non-secrets',
             file:'./staging/has-no-secret.json',
@@ -15,24 +39,27 @@ const TESTS = {
             file:'./staging/has-secret.json',
             errorCount: 1
         }
-    ]
-}
+];
 
 
-describe('JSON compat testing',() => {
-    const configs = Object.entries(TESTS);
-    for(const [config,tests] of configs){
-        const cli = new CLIEngine(require(config));
-        const files = tests.map(test => test.file);
-        const {results} = cli.executeOnFiles(files);
-        describe(config,() => {
-            for(let i=0;i < tests.length;i++){
-                const test = tests[i];
-                const report = results[i];
-                it(test.name,() => {
-                    assert.strictEqual(test.errorCount,report.errorCount);
-                });
-            }
-        });
+
+describe('Staged Testing', () => {
+    const files = TESTS.map(test => test.file);
+    async function testConfig(config){
+        const cli = new ESLint(config);
+        const results = await cli.lintFiles(files);
+        for(let i=0;i < TESTS.length;i++){
+            const test = TESTS[i];
+            const report = results[i];
+            it(test.name,() => {
+                assert.strictEqual(test.errorCount,report.errorCount);
+            });
+        }
     }
-});
+    describe('Bugged Config',async () => {
+        await testConfig(BUGGED_CONFIG);
+    });
+    describe('Working Config',async () => {
+        await testConfig(WORKING_CONFIG);
+    });
+})
