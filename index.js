@@ -125,15 +125,5 @@ module.exports = {
         };
       }
     }
-  },
-  processors: {
-    ".json": {
-      preprocess(text) {
-        return [`var json = ${text}`];
-      },
-      postprocess(messages, fileName) {
-        return messages[0];
-      }
-    }
   }
 };
