@@ -1,5 +1,5 @@
 const exec = require('util').promisify(require('child_process').execFile);
-const CLIEngine = require("eslint6").CLIEngine;
+const ESLint = require("eslint").ESLint;
 const assert = require('assert');
 
 
@@ -19,12 +19,12 @@ const TESTS = {
 }
 
 
-describe('JSON compat testing',() => {
+describe('JSON compat testing', async () => {
     const configs = Object.entries(TESTS);
     for(const [config,tests] of configs){
-        const cli = new CLIEngine(require(config));
+        const eslint = new ESLint();
         const files = tests.map(test => test.file);
-        const {results} = cli.executeOnFiles(files);
+        const results = await eslint.lintFiles(files);
         describe(config,() => {
             for(let i=0;i < tests.length;i++){
                 const test = tests[i];

@@ -1,5 +1,5 @@
 const RuleTester6 = require("eslint6").RuleTester,
-RuleTester7 = require("eslint7").RuleTester,
+RuleTester7 = require("eslint").RuleTester,
   rule = require("../../..").rules["no-secrets"],
   { HIGH_ENTROPY, PATTERN_MATCH } = require("../../../utils"),
   P = require("../../../regexes"),

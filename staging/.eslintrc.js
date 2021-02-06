@@ -1,4 +1,7 @@
 module.exports = {
+    "extends": [
+      "plugin:jsonc/base"
+    ],
     "plugins": [
       "self"
     ],
