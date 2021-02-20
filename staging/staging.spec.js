@@ -1,10 +1,10 @@
-const exec = require('util').promisify(require('child_process').execFile);
+const path = require('path');
 const ESLint = require("eslint").ESLint;
 const assert = require('assert');
 
 
 const TESTS = {
-    './staging.config.js':[
+    'jsonc.eslintrc.js':[
         {
             name:'Should not detect non-secrets',
             file:'./staging/has-no-secret.json',
@@ -22,7 +22,7 @@ const TESTS = {
 describe('JSON compat testing', async () => {
     const configs = Object.entries(TESTS);
     for(const [config,tests] of configs){
-        const eslint = new ESLint();
+        const eslint = new ESLint({overrideConfigFile:path.join(__dirname,config)});
         const files = tests.map(test => test.file);
         const results = await eslint.lintFiles(files);
         describe(config,() => {
