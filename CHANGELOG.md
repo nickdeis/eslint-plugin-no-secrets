@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.7.9
+### Minor
+ - Add support for linting comments
 ## 0.6.9
 ### Patch
  - Add eslint 7 unit testing

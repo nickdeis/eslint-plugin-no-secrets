@@ -69,7 +69,12 @@ class A {
 
 const IS_REALLY_A_NAMESPACE_TEST = `
 const NAMESPACE_CLASSNAME = 'Validation.JSONSchemaValidationUtilsImplFactory';
-`
+`;
+
+const COMMENTS_TEST = `
+// const password = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
+const password = "";
+`;
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
@@ -169,6 +174,10 @@ const TESTS = {
     },
     {
       code:SECRET_LOWERCASE_STRING,
+      errors:[HIGH_ENTROPY_MSG]
+    },
+    {
+      code: COMMENTS_TEST,
       errors:[HIGH_ENTROPY_MSG]
     }
   ].concat(PATTERN_MATCH_TESTS)
