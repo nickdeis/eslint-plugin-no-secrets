@@ -125,18 +125,12 @@ module.exports = {
             if (!node.value) return;
             const value = node.value.cooked;
             checkString(value, node);
+          },
+          JSONLiteral(node){
+            const { value } = node;
+            checkString(value, node);
           }
         };
-      }
-    }
-  },
-  processors: {
-    ".json": {
-      preprocess(text) {
-        return [`var json = ${text}`];
-      },
-      postprocess(messages, fileName) {
-        return messages[0];
       }
     }
   }

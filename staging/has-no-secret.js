@@ -1,0 +1,1 @@
+const NOT_A_SECRET = "Hopefully not a secret";
