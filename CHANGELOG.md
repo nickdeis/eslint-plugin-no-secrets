@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.8.9
+### Minor
+ - Replaced how JSON document scanning worked so it works with other plugins
 ## 0.7.9
 ### Minor
  - Add support for linting comments
