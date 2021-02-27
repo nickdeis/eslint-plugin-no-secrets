@@ -1,7 +1,5 @@
 module.exports = {
-    "extends": [
-      "plugin:jsonc/base"
-    ],
+    env: { es6: true },
     "plugins": [
       "self"
     ],
