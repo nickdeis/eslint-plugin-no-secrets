@@ -54,7 +54,7 @@ module.exports = {
           ignoreCase
         } = checkOptions(context.options[0] || {});
         const sourceCode = context.getSourceCode();
-        const comments = sourceCode.getAllComments();
+        
         const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
         const allDelimiters = additionalDelimiters.concat([" "]);
 
@@ -111,6 +111,10 @@ module.exports = {
             patternReport(payload, node);
           });
         }
+
+        //Check all comments
+        const comments = sourceCode.getAllComments();
+        comments.forEach(comment => checkString(comment.value,comment));
 
         return {
           Literal(node) {
