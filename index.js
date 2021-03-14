@@ -127,7 +127,9 @@ module.exports = {
             checkString(value, node);
           },
           JSONLiteral(node){
-            const { value } = node;
+            const { value, parent } = node;
+            const nodeIsIdentifier = parent.type === 'JSONProperty' && parent.key === node
+				    if (nodeIsIdentifier) return;
             checkString(value, node);
           }
         };
