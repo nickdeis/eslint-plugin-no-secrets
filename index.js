@@ -118,7 +118,9 @@ module.exports = {
 
         return {
           Literal(node) {
-            const { value } = node;
+            const { value, parent } = node;
+            const nodeIsPropertyName = parent.type === 'Property' && parent.key === node
+            if (nodeIsPropertyName) return;
             checkString(value, node);
           },
           TemplateElement(node) {
@@ -128,8 +130,8 @@ module.exports = {
           },
           JSONLiteral(node){
             const { value, parent } = node;
-            const nodeIsIdentifier = parent.type === 'JSONProperty' && parent.key === node
-            if (nodeIsIdentifier) return;
+            const nodeIsPropertyName = parent.type === 'JSONProperty' && parent.key === node
+            if (nodeIsPropertyName) return;
             checkString(value, node);
           }
         };
