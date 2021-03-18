@@ -42,6 +42,13 @@ const VAULT = {
 const CSS_CLASSNAME = `
 const CSS_CLASSNAME = "hey-it-s-a-css-class-not-a-secret and-neither-this-one";
 `;
+
+const PROPERTY_NAME = `
+const VAULT = {
+  "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva": "not a secret"
+}
+`;
+
 const IGNORE_CONTENT_TEST = `
 const BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 `;
@@ -115,6 +122,10 @@ const TESTS = {
     },
     {
       code: CSS_CLASSNAME,
+      options: []
+    },
+    {
+      code: PROPERTY_NAME,
       options: []
     },
     {
