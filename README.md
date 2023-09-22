@@ -144,7 +144,7 @@ For example, if you want to split words up by the character `.` and by camelcase
 
 |Option|Description|Default|Type|
 |------|-----------|----------------|----|
-|tolerance|Maximum "randomness"/entropy allowed|`4`|`number`|
+|tolerance|Minimum "randomness"/entropy allowed. Only strings **above** this threshold will be shown. |`4`|`number`|
 |additionalRegexes|Object of additional patterns to check. Key is check name and value is corresponding pattern |`{}`|{\[regexCheckName:string]:string \| RegExp}|
 |ignoreContent|Will ignore the *entire* string if matched. Expects either a pattern or an array of patterns. This option takes precedent over `additionalRegexes` and the default regular expressions|`[]`|string \| RegExp \| (string\|RegExp)[]|
 |ignoreModules|Ignores strings that are an argument in `import()` and `require()` or is the path in an `import` statement.|`true`|`boolean`|
