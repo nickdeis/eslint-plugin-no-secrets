@@ -25,12 +25,12 @@
     "eslint-plugin-jsonc": "^0.9.0",
     "eslint-plugin-self": "^1.2.0",
     "eslint6": "npm:eslint@^6.8.0",
+    "lodash": "^4.17.21",
     "mocha": "^7.1.1"
   },
   "peerDependencies": {
     "eslint": ">=3.0.0"
   },
-  "dependencies": {},
   "engines": {
     "npm": ">=6.9.0",
     "node": ">=10.0.0"
