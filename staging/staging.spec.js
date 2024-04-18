@@ -1,5 +1,6 @@
 const path = require('path');
 const ESLint = require("eslint").ESLint;
+const ESLint9 = require("eslint9").ESLint;
 const assert = require('assert');
 
 const JSON_FILES = [
@@ -34,11 +35,16 @@ const TESTS = {
     'mixed.eslintrc.js': [].concat(JSON_FILES).concat(JS_FILES)
 }
 
+const FLAT_TESTS = {
+    'jsonc-flat.eslintrc.js': JSON_FILES,
+    'normal-flat.eslintrc.js': JS_FILES,
+    'mixed-flat.eslintrc.js': [].concat(JSON_FILES).concat(JS_FILES) 
+}
 
-describe('JSON compat testing', async () => {
-    const configs = Object.entries(TESTS);
+async function runTests(tests,eslintClazz){
+    const configs = Object.entries(tests);
     for(const [config,tests] of configs){
-        const eslint = new ESLint({overrideConfigFile:path.join(__dirname,config)});
+        const eslint = new eslintClazz({overrideConfigFile:path.join(__dirname,config)});
         const files = tests.map(test => test.file);
         const results = await eslint.lintFiles(files);
         describe(config,() => {
@@ -51,4 +57,15 @@ describe('JSON compat testing', async () => {
             }
         });
     }
-});
+}
+
+describe("Staging tests", () => {
+    describe('JSON compat testing', async () => {
+        runTests(TESTS,ESLint);
+    });
+    
+    describe('Flat config testing', async () => {
+        runTests(FLAT_TESTS,ESLint9);
+    });
+})
+
