@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.0.0
+
+### Major
+
+- This package has been out long enough for 1.0.0 release
+
+### Minor
+
+- Added support and tests for ESLint "flag config"
+
 ## 0.9.1
 
 ### Patch
