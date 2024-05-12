@@ -31,9 +31,14 @@ function shouldIgnore(value, toIgnore) {
 }
 
 module.exports = {
+  meta: {
+    name: "eslint-plugin-no-secrets",
+    version: "1.0.0-eslint9"
+  },
   rules: {
     "no-secrets": {
       meta: {
+        schema: false,
         messages: {
           [HIGH_ENTROPY]: `Found a string with entropy {{ entropy }} : "{{ token }}"`,
           [PATTERN_MATCH]: `Found a string that matches "{{ name }}" : "{{ match }}"`
