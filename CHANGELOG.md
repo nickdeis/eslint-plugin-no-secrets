@@ -8,7 +8,7 @@
 
 ### Minor
 
-- Added support and tests for ESLint "flag config"
+- Added support and tests for ESLint "flat config"
 
 ### Patch
 
