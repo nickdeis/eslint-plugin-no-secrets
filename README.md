@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets.svg)](https://travis-ci.org/nickdeis/eslint-plugin-no-secrets)
+[![Build Status](https://github.com/nickdeis/eslint-plugin-no-secrets/actions/workflows/main.yml/badge.svg)](https://github.com/nickdeis/eslint-plugin-no-secrets/actions/workflows/main.yml/badge.svg)
 
 # eslint-plugin-no-secrets
 
