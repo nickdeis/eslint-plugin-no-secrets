@@ -98,7 +98,7 @@ export default [
   {
     languageOptions: { ecmaVersion: 6 },
     plugins: {
-      "no-secrets": noSecret,
+      "no-secrets": noSecrets,
     },
     rules: {
       "no-secrets/no-secrets": "error",
