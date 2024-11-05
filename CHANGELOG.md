@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 1.1.2
+
+### Minor
+
+- Added typings (thank you @mjlehrke)
+
+### Patch
+
+- Patched some packages
+
 ## 1.0.2
 
 ### Major

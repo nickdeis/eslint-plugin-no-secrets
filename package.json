@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "1.0.2",
+  "version": "1.1.2",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "index.js",
   "types": "index.d.ts",
@@ -22,6 +22,7 @@
   "repository": "https://github.com/nickdeis/eslint-plugin-no-secrets",
   "license": "MIT",
   "devDependencies": {
+    "@types/eslint": "^9.6.1",
     "eslint": "^7.19.0",
     "eslint-plugin-jsonc": "^2.15.1",
     "eslint-plugin-self": "^1.2.0",
