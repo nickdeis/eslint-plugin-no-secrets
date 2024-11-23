@@ -1,5 +1,8 @@
-const { HIGH_ENTROPY, PATTERN_MATCH } = require("../../../utils"),
-P = require("../../../regexes");
+import P from "../../../src/regexes";
+import { HIGH_ENTROPY, PATTERN_MATCH } from "../../../src/utils";
+import RULE_TESTERS from "./rule-testers";
+import { rules } from "../../../src/index";
+const noSecrets = rules["no-secrets"];
 
 const STRING_TEST = `
 const NOT_A_SECRET = "I'm not a secret, I think";
@@ -9,7 +12,8 @@ const IMPORT_REQUIRE_TEST = `
 const webpackFriendlyConsole = require('./config/webpack/webpackFriendlyConsole')
 `;
 
-const TEMPLATE_TEST = "const NOT_A_SECRET = `A template that isn't a secret. ${1+1} = 2`";
+const TEMPLATE_TEST =
+  "const NOT_A_SECRET = `A template that isn't a secret. ${1+1} = 2`";
 
 const SECRET_STRING_TEST = `
 const A_SECRET = "ZWVTjPQSdhwRgl204Hc51YCsritMIzn8B=/p9UyeX7xu6KkAGqfm3FJ+oObLDNEva";
@@ -69,121 +73,133 @@ const password = "";
 /**
  * Test to make sure regular expressions aren't triggered by the entropy check
  */
- const REGEX_TESTS = [
+const REGEX_TESTS = [
   P["Slack Token"],
   P["AWS API Key"],
   P["Facebook Oauth"],
   P["Twitter Oauth"],
-  P["Password in URL"]
-].map(regexp => ({ code: `const REGEXP = \`${regexp.source}\``, options: [] }));
-
-const HIGH_ENTROPY_MSG = {
-  messageId: HIGH_ENTROPY
-};
-const PATTERN_MATCH_MSG = {
-  messageId: PATTERN_MATCH
-};
-
-const PATTERN_MATCH_TESTS = [P["Google (GCP) Service-account"], P["RSA private key"]].map(regexp => ({
+  P["Password in URL"],
+].map((regexp) => ({
   code: `const REGEXP = \`${regexp.source}\``,
   options: [],
-  errors: [PATTERN_MATCH_MSG]
 }));
 
+const HIGH_ENTROPY_MSG = {
+  messageId: HIGH_ENTROPY,
+};
+const PATTERN_MATCH_MSG = {
+  messageId: PATTERN_MATCH,
+};
+
+const PATTERN_MATCH_TESTS = [
+  P["Google (GCP) Service-account"],
+  P["RSA private key"],
+].map((regexp) => ({
+  code: `const REGEXP = \`${regexp.source}\``,
+  options: [],
+  errors: [PATTERN_MATCH_MSG],
+}));
 
 const IMPORT_TEST_LEGACY = {
   code: IMPORT_TEST,
   options: [{ ignoreModules: true }],
-  parserOptions: { sourceType: "module", ecmaVersion: 7 }
+  parserOptions: { sourceType: "module", ecmaVersion: 7 },
 };
 
 const IMPORT_TEST_FLAT = {
   code: IMPORT_TEST,
   options: [{ ignoreModules: true }],
-  languageOptions: {sourceType: "module", ecmaVersion: 7 }
-}
+  languageOptions: { sourceType: "module", ecmaVersion: 7 },
+};
 
-function createTests(flatConfig = false){
+export function createTests(flatConfig = false) {
   return {
     valid: [
       {
         code: STRING_TEST,
-        options: []
+        options: [],
       },
       {
         code: TEMPLATE_TEST,
-        options: []
+        options: [],
       },
       {
         code: IMPORT_REQUIRE_TEST,
-        options: []
+        options: [],
       },
       {
         code: CSS_CLASSNAME,
-        options: []
+        options: [],
       },
       {
         code: IGNORE_CONTENT_TEST,
-        options: [{ ignoreContent: [/^ABC/] }]
+        options: [{ ignoreContent: [/^ABC/] }],
       },
       {
         code: IGNORE_CONTENT_TEST,
-        options: [{ ignoreContent: "^ABC" }]
+        options: [{ ignoreContent: "^ABC" }],
       },
       {
         //Property
         code: IGNORE_FIELD_TEST,
-        options: [{ ignoreIdentifiers:[/NOT_A_SECRET/] }]
+        options: [{ ignoreIdentifiers: [/NOT_A_SECRET/] }],
       },
-      flatConfig ? IMPORT_TEST_FLAT:IMPORT_TEST_LEGACY,
+      flatConfig ? IMPORT_TEST_FLAT : IMPORT_TEST_LEGACY,
       {
         //VariableDeclarator
         code: IGNORE_VAR_TEST,
-        options: [{ignoreIdentifiers:"NOT_A_SECRET"}]
+        options: [{ ignoreIdentifiers: "NOT_A_SECRET" }],
       },
       {
-        code:IS_REALLY_A_NAMESPACE_TEST,
-        options: [{additionalDelimiters:["."]}]
+        code: IS_REALLY_A_NAMESPACE_TEST,
+        options: [{ additionalDelimiters: ["."] }],
       },
       {
-        code:IS_REALLY_A_NAMESPACE_TEST,
-        options: [{ignoreCase:true}]
-      }
+        code: IS_REALLY_A_NAMESPACE_TEST,
+        options: [{ ignoreCase: true }],
+      },
     ].concat(REGEX_TESTS),
     invalid: [
       {
         code: SECRET_STRING_TEST,
         options: [],
-        errors: [HIGH_ENTROPY_MSG]
+        errors: [HIGH_ENTROPY_MSG],
       },
       {
         code: A_BEARER_TOKEN,
         options: [],
-        errors: [HIGH_ENTROPY_MSG]
+        errors: [HIGH_ENTROPY_MSG],
       },
       {
         code: IN_AN_OBJECT,
         options: [],
-        errors: [HIGH_ENTROPY_MSG]
+        errors: [HIGH_ENTROPY_MSG],
       },
       {
         code: `
           const BASIC_AUTH_HEADER =  "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l"
         `,
-        options: [{ additionalRegexes: { "Basic Auth": "Authorization: Basic [A-Za-z0-9+/=]*" } }],
-        errors: [HIGH_ENTROPY_MSG, PATTERN_MATCH_MSG]
+        options: [
+          {
+            additionalRegexes: {
+              "Basic Auth": "Authorization: Basic [A-Za-z0-9+/=]*",
+            },
+          },
+        ],
+        errors: [HIGH_ENTROPY_MSG, PATTERN_MATCH_MSG],
       },
       {
-        code:SECRET_LOWERCASE_STRING,
-        errors:[HIGH_ENTROPY_MSG]
+        code: SECRET_LOWERCASE_STRING,
+        errors: [HIGH_ENTROPY_MSG],
       },
       {
         code: COMMENTS_TEST,
-        errors:[HIGH_ENTROPY_MSG]
-      }
-    ].concat(PATTERN_MATCH_TESTS)
+        errors: [HIGH_ENTROPY_MSG],
+      },
+    ].concat(PATTERN_MATCH_TESTS),
   };
 }
 
-module.exports = {createTests}
-
+RULE_TESTERS.forEach(([version, ruleTester]) => {
+  ruleTester.run("no-secrets", noSecrets, createTests(9 <= version));
+});

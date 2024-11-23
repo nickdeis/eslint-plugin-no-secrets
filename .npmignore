@@ -3,3 +3,4 @@ tests/*
 *.log
 staging/*
 .travis.yml
+.github/*

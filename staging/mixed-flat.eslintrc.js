@@ -1,15 +1,15 @@
-const noSecret = require("..");
+const noSecret = require("../dist");
 const jsoncExtend = require("eslint-plugin-jsonc");
 
 module.exports = [
-    ...jsoncExtend.configs['flat/recommended-with-jsonc'],
-    {
-        languageOptions: { ecmaVersion: 6 },
-        "plugins": {
-            "no-secrets":noSecret
-        },
-        "rules": {
-          "no-secrets/no-secrets": "error"
-        }
-    }
-]
+  ...jsoncExtend.configs["flat/recommended-with-jsonc"],
+  {
+    languageOptions: { ecmaVersion: 6 },
+    plugins: {
+      "no-secrets": noSecret,
+    },
+    rules: {
+      "no-secrets/no-secrets": "error",
+    },
+  },
+];

@@ -3,27 +3,41 @@ const MATH_LOG_2 = Math.log(2);
  * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters,
  * which raise a lot of false postives and aren't usually in passwords/secrets
  */
-const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=!|*^@~`$%+?\"'_<>".split("");
+const CHARSET =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=!|*^@~`$%+?\"'_<>".split(
+    ""
+  );
 const DEFAULT_TOLERANCE = 4;
-const DEFAULT_ADDTIONAL_REGEXES = {};
+export const DEFAULT_ADDTIONAL_REGEXES = {};
 
-function isPlainObject(obj) {
+type PlainObject = {
+  [key: string | number]: any;
+};
+
+export function isPlainObject(obj: any): obj is PlainObject {
   return typeof obj === "object" && obj.constructor === Object;
 }
 
-function compileListOfPatterns(patterns = [], name) {
+function compileListOfPatterns(
+  patterns: string | RegExp | (string | RegExp)[] = [],
+  name?: string
+) {
   if (!Array.isArray(patterns)) {
     if (typeof patterns === "string" || patterns instanceof RegExp) {
       patterns = [patterns];
     } else {
-      throw new Error(`Expected '${name}' to be an a array, a string, or a RegExp`);
+      throw new Error(
+        `Expected '${name}' to be an a array, a string, or a RegExp`
+      );
     }
   }
 
-  const compiledPatterns = [];
+  const compiledPatterns: RegExp[] = [];
   for (let i = 0; i < patterns.length; i++) {
     try {
-      compiledPatterns[i] = patterns[i] instanceof RegExp ? patterns[i] : new RegExp(String(patterns[i]));
+      const pattern = patterns[i];
+      compiledPatterns[i] =
+        pattern instanceof RegExp ? pattern : new RegExp(String(pattern));
     } catch (e) {
       throw new Error("Failed to compiled the regexp " + patterns[i]);
     }
@@ -31,49 +45,73 @@ function compileListOfPatterns(patterns = [], name) {
   return compiledPatterns;
 }
 
-function booleanOption(value,name,defaultValue){
+function booleanOption(value: any, name: string, defaultValue: any): boolean {
+  //TODO: This is kind of ridiclous check, fix this
   value = value || defaultValue;
-  if(typeof value !== "boolean"){
+  if (typeof value !== "boolean") {
     throw new Error(`The option '${name}' must be boolean`);
   }
   return value;
 }
 
-function checkOptions({
+export function plainObjectOption(
+  value: any,
+  name: string,
+  defaultValue: PlainObject
+) {
+  value = value || defaultValue;
+  if (!isPlainObject(value)) {
+    throw new Error(`The option '${name}' must be a plain object`);
+  }
+  return value;
+}
+
+export function validateRecordOfRegex(recordOfRegex: PlainObject) {
+  const compiledRegexes: Record<string, RegExp> = {};
+  for (const regexName in recordOfRegex) {
+    if (recordOfRegex.hasOwnProperty(regexName)) {
+      try {
+        compiledRegexes[regexName] =
+          recordOfRegex[regexName] instanceof RegExp
+            ? recordOfRegex[regexName]
+            : new RegExp(String(recordOfRegex[regexName]));
+      } catch (e) {
+        throw new Error(
+          "Could not compile the regexp " +
+            regexName +
+            " with the value " +
+            recordOfRegex[regexName]
+        );
+      }
+    }
+  }
+  return compiledRegexes;
+}
+
+export function checkOptions({
   tolerance,
   additionalRegexes,
   ignoreContent,
   ignoreModules,
   ignoreIdentifiers,
   additionalDelimiters,
-  ignoreCase
+  ignoreCase,
 }) {
-  ignoreModules = booleanOption(ignoreModules,'ignoreModules',true);
-  ignoreCase = booleanOption(ignoreCase,'ignoreCase',false);
+  ignoreModules = booleanOption(ignoreModules, "ignoreModules", true);
+  ignoreCase = booleanOption(ignoreCase, "ignoreCase", false);
   tolerance = tolerance || DEFAULT_TOLERANCE;
   if (typeof tolerance !== "number" || tolerance <= 0) {
-    throw new Error("The option tolerance must be a postive (eg greater than zero) number");
+    throw new Error(
+      "The option tolerance must be a positive (eg greater than zero) number"
+    );
   }
-  additionalRegexes = additionalRegexes || DEFAULT_ADDTIONAL_REGEXES;
-  if (!isPlainObject(additionalRegexes)) {
-    throw new Error("Expected additionalRegexes to be a plain object");
-  }
+  additionalRegexes = plainObjectOption(
+    additionalRegexes,
+    "additionalRegexes",
+    DEFAULT_ADDTIONAL_REGEXES
+  );
 
-  const compiledRegexes = {};
-  for (const regexName in additionalRegexes) {
-    if (additionalRegexes.hasOwnProperty(regexName)) {
-      try {
-        compiledRegexes[regexName] =
-          additionalRegexes[regexName] instanceof RegExp
-            ? additionalRegexes[regexName]
-            : new RegExp(String(additionalRegexes[regexName]));
-      } catch (e) {
-        throw new Error(
-          "Could not compile the regexp " + regexName + " with the value " + additionalRegexes[regexName]
-        );
-      }
-    }
-  }
+  const compiledRegexes = validateRecordOfRegex(additionalRegexes);
 
   return {
     tolerance,
@@ -82,7 +120,7 @@ function checkOptions({
     ignoreModules,
     ignoreIdentifiers: compileListOfPatterns(ignoreIdentifiers),
     additionalDelimiters: compileListOfPatterns(additionalDelimiters),
-    ignoreCase
+    ignoreCase,
   };
 }
 
@@ -90,7 +128,7 @@ function checkOptions({
  * From https://github.com/dxa4481/truffleHog/blob/dev/truffleHog/truffleHog.py#L85
  * @param {*} str
  */
-function shannonEntropy(str) {
+export function shannonEntropy(str: string) {
   if (!str) return 0;
   let entropy = 0;
   const len = str.length;
@@ -109,7 +147,7 @@ const MODULE_FUNCTIONS = ["import", "require"];
  * Inspired by https://github.com/benmosher/eslint-plugin-import/blob/45bfe472f38ef790c11efe45ffc59808c67a3f94/src/core/staticRequire.js
  * @param {*} node
  */
-function isStaticImportOrRequire(node) {
+function isStaticImportOrRequire(node): boolean {
   return (
     node &&
     node.callee &&
@@ -125,17 +163,21 @@ function isImportString(node) {
   return node && node.parent && node.parent.type === "ImportDeclaration";
 }
 
-function isModulePathString(node) {
+export function isModulePathString(node) {
   return isStaticImportOrRequire(node.parent) || isImportString(node) || false;
 }
 
 const VARORPROP = ["AssignmentExpression", "Property", "VariableDeclarator"];
 
 function getPropertyName(node) {
-  return node.parent.key && node.parent.key.type === "Identifier" && node.parent.key.name;
+  return (
+    node.parent.key &&
+    node.parent.key.type === "Identifier" &&
+    node.parent.key.name
+  );
 }
 
-function getIdentifierName(node) {
+export function getIdentifierName(node): false | string {
   if (!node || !node.parent) return false;
   switch (node.parent.type) {
     case "VariableDeclarator":
@@ -149,18 +191,19 @@ function getIdentifierName(node) {
   }
 }
 
-function getVarName(node) {
+function getVarName(node): string {
   return node.parent.id && node.parent.id.name;
 }
 
 function getAssignmentName(node) {
   return (
-    node.parent.left && node.parent.property && node.parent.property.type === "Identifier" && node.parent.property.name
+    node.parent.left &&
+    node.parent.property &&
+    node.parent.property.type === "Identifier" &&
+    node.parent.property.name
   );
 }
 
-const HIGH_ENTROPY = "HIGH_ENTROPY";
+export const HIGH_ENTROPY = "HIGH_ENTROPY";
 
-const PATTERN_MATCH = "PATTERN_MATCH";
-
-module.exports = { getIdentifierName, shannonEntropy, checkOptions, HIGH_ENTROPY, PATTERN_MATCH, isModulePathString };
+export const PATTERN_MATCH = "PATTERN_MATCH";
