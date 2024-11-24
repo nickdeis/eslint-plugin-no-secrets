@@ -52,31 +52,60 @@ function findAllNewLines(text: string) {
   return posistions;
 }
 
+type LineTextArea = {
+  lineNo: number;
+  startCol: number;
+  endCol: number;
+};
+
+type TextAreaSelection = {
+  startIdx: number;
+  endIdx: number;
+  lineSelections: LineTextArea[];
+};
+
 function findLineAndColNoFromMatchIdx(
-  idx: number,
+  startIdx: number,
   linesIdx: number[],
   matchLength: number
-) {
+): TextAreaSelection {
+  const endIdx = startIdx + matchLength;
+  const lineSelections: LineTextArea[] = [];
   for (let i = 0; i < linesIdx.length; i++) {
     const lnIdx = linesIdx[i];
-    if (idx <= lnIdx) {
-      const lineNo = i + 1;
-      const endCol = lnIdx - idx + 1;
-      const startCol = endCol - matchLength;
-      return {
-        startCol,
-        lineNo,
-        endCol,
-      };
+    const lineNo = i + 1;
+    if (startIdx <= lnIdx && (linesIdx[i - 1] || 0) <= startIdx) {
+      //Last line
+      if (endIdx <= lnIdx) {
+        const endCol = endIdx - linesIdx[i - 1];
+        let startCol = endCol - matchLength;
+        if (startCol < 0) {
+          startCol = 0;
+        }
+        lineSelections.push({ lineNo, endCol, startCol });
+        return { endIdx, startIdx, lineSelections };
+      } else {
+        //not last line
+        const endCol = lnIdx - linesIdx[i - 1];
+        let startCol = endCol - (lnIdx - startIdx);
+        if (startCol < 0) {
+          startCol = 0;
+        }
+        lineSelections.push({ lineNo, endCol, startCol });
+      }
+    }
+    if (endIdx <= lnIdx) {
+      const endCol = endIdx - linesIdx[i - 1];
+      let startCol = endCol - matchLength;
+      if (startCol < 0) {
+        startCol = 0;
+      }
+      lineSelections.push({ lineNo, endCol, startCol });
+      return { endIdx, startIdx, lineSelections };
     }
   }
+  return { endIdx, startIdx, lineSelections };
 }
-
-type MatchInstance = { pattern: string | RegExp; multiline?: boolean };
-
-type MatchInstanceRaw = string | RegExp | MatchInstance;
-
-function multiLinePatternMatch() {}
 
 const noPatternMatch: Rule.RuleModule = {
   meta: {
@@ -107,7 +136,7 @@ const noPatternMatch: Rule.RuleModule = {
           newLinePos,
           match.length
         );
-        //console.log({ match, meta });
+        //console.dir({ match, meta }, { depth: 3 });
       }
     }
 

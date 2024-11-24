@@ -37,22 +37,34 @@ function findAllNewLines(text) {
     }
     return posistions;
 }
-function findLineAndColNoFromMatchIdx(idx, linesIdx, matchLength) {
+function findLineAndColNoFromMatchIdx(startIdx, linesIdx, matchLength) {
+    const endIdx = startIdx + matchLength;
+    let startLine = 0;
     for (let i = 0; i < linesIdx.length; i++) {
         const lnIdx = linesIdx[i];
-        if (idx <= lnIdx) {
-            const lineNo = i + 1;
-            const endCol = lnIdx - idx + 1;
-            const startCol = endCol - matchLength;
+        if (lnIdx <= startIdx && startIdx <= linesIdx[i + 1]) {
+            startLine = i + 1;
+        }
+        if (endIdx <= lnIdx) {
+            const endLineNo = i + 1;
+            const endCol = lnIdx - linesIdx[i - 1];
+            let startCol = endCol - matchLength;
             return {
-                startCol,
-                lineNo,
-                endCol,
+                endIdx,
+                startIdx,
+                startLine,
+                lnIdx,
+                lineSelection: [
+                    {
+                        lineNo: endLineNo,
+                        startCol,
+                        endCol,
+                    },
+                ],
             };
         }
     }
 }
-function multiLinePatternMatch() { }
 const noPatternMatch = {
     meta: {
         schema: false,
@@ -75,7 +87,7 @@ const noPatternMatch = {
                 const idx = m.index;
                 const match = m[0];
                 const meta = findLineAndColNoFromMatchIdx(idx, newLinePos, match.length);
-                //console.log({ match, meta });
+                console.dir({ match, meta }, { depth: 3 });
             }
         }
         return {};

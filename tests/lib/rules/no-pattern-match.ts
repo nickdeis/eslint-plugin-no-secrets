@@ -18,7 +18,7 @@ function createTests(_flatConfig = false) {
           {
             additionalPatterns: {
               Test: /secret/i,
-              MultiLine: /VAULT = {[\n.\s\t]*to/i,
+              MultiLine: /VAULT = {[\n.\s\t]*to/im,
             },
           },
         ],

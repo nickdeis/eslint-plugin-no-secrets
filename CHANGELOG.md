@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2.1.0
+
+### Major
+
+- Removed support for non-supported node & npm versions
+- Removed support for ESLint 4 and below
+
+### Minor
+
+- Module is now written in typescript
+
 ## 1.1.2
 
 ### Minor
