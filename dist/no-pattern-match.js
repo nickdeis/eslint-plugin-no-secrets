@@ -39,31 +39,42 @@ function findAllNewLines(text) {
 }
 function findLineAndColNoFromMatchIdx(startIdx, linesIdx, matchLength) {
     const endIdx = startIdx + matchLength;
-    let startLine = 0;
+    const lineSelections = [];
     for (let i = 0; i < linesIdx.length; i++) {
         const lnIdx = linesIdx[i];
-        if (lnIdx <= startIdx && startIdx <= linesIdx[i + 1]) {
-            startLine = i + 1;
+        const lineNo = i + 1;
+        if (startIdx <= lnIdx && (linesIdx[i - 1] || 0) <= startIdx) {
+            //Last line
+            if (endIdx <= lnIdx) {
+                const endCol = endIdx - linesIdx[i - 1];
+                let startCol = endCol - matchLength;
+                if (startCol < 0) {
+                    startCol = 0;
+                }
+                lineSelections.push({ lineNo, endCol, startCol });
+                return { endIdx, startIdx, lineSelections };
+            }
+            else {
+                //not last line
+                const endCol = lnIdx - linesIdx[i - 1];
+                let startCol = endCol - (lnIdx - startIdx);
+                if (startCol < 0) {
+                    startCol = 0;
+                }
+                lineSelections.push({ lineNo, endCol, startCol });
+            }
         }
         if (endIdx <= lnIdx) {
-            const endLineNo = i + 1;
-            const endCol = lnIdx - linesIdx[i - 1];
+            const endCol = endIdx - linesIdx[i - 1];
             let startCol = endCol - matchLength;
-            return {
-                endIdx,
-                startIdx,
-                startLine,
-                lnIdx,
-                lineSelection: [
-                    {
-                        lineNo: endLineNo,
-                        startCol,
-                        endCol,
-                    },
-                ],
-            };
+            if (startCol < 0) {
+                startCol = 0;
+            }
+            lineSelections.push({ lineNo, endCol, startCol });
+            return { endIdx, startIdx, lineSelections };
         }
     }
+    return { endIdx, startIdx, lineSelections };
 }
 const noPatternMatch = {
     meta: {
@@ -87,7 +98,7 @@ const noPatternMatch = {
                 const idx = m.index;
                 const match = m[0];
                 const meta = findLineAndColNoFromMatchIdx(idx, newLinePos, match.length);
-                console.dir({ match, meta }, { depth: 3 });
+                //console.dir({ match, meta }, { depth: 3 });
             }
         }
         return {};
