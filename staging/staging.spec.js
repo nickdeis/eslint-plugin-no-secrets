@@ -13,7 +13,7 @@ const JSON_FILES = [
   {
     name: "Should detect secrets in json files",
     file: "./staging/has-secret.json",
-    errorCount: 1,
+    errorCount: 2,
   },
 ];
 
@@ -26,7 +26,7 @@ const JS_FILES = [
   {
     name: "Should detect secrets in json files",
     file: "./staging/has-secret.js",
-    errorCount: 1,
+    errorCount: 2,
   },
 ];
 

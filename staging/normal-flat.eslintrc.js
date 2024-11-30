@@ -6,5 +6,9 @@ module.exports = {
   },
   rules: {
     "no-secrets/no-secrets": "error",
+    "no-secrets/no-pattern-match": [
+      "error",
+      { patterns: { SecretJS: /const SECRET/, SecretJSON: /\"SECRET\"/ } },
+    ],
   },
 };
