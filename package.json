@@ -1,14 +1,14 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "1.4.2",
+  "version": "2.1.0",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "./dist/index.js",
-  "types": "index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "npm run test:unit && npm run build && npm run test:staging",
+    "test": "npm run test:unit && npm run test:staging",
     "test:unit": "ts-node tests/lib/rules",
-    "test:staging": "node ./staging/staging.spec.js"
+    "test:staging": "npm run build && node ./staging/staging.spec.js"
   },
   "keywords": [
     "eslint",
@@ -16,7 +16,6 @@
     "security",
     "secure",
     "secrets",
-    "security",
     "lint",
     "eslintplugin"
   ],

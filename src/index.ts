@@ -1,4 +1,4 @@
-import type { Rule } from "eslint";
+import type { Rule, ESLint } from "eslint";
 import {
   getIdentifierName,
   shannonEntropy,
@@ -34,9 +34,9 @@ function shouldIgnore(value: string, toIgnore) {
   return false;
 }
 
-const meta = {
+const meta: ESLint.Plugin["meta"] = {
   name: "eslint-plugin-no-secrets",
-  version: "1.0.0-eslint9",
+  version: "2.1.0",
 };
 
 const noSecrets: Rule.RuleModule = {

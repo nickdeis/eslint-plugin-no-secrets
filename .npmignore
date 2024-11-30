@@ -4,3 +4,5 @@ tests/*
 staging/*
 .travis.yml
 .github/*
+src/*
+tsconfig.json
