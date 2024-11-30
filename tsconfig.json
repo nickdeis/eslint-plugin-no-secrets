@@ -9,8 +9,7 @@
     "forceConsistentCasingInFileNames": true, 
 
     "strict": false, 
-    "skipLibCheck": true,
-    "declaration": true 
+    "skipLibCheck": true
   },
   "include": [
     "./src/**/*"

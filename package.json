@@ -3,7 +3,7 @@
   "version": "2.1.0",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "npm run test:unit && npm run test:staging",
