@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PATTERN_MATCH = exports.HIGH_ENTROPY = exports.DEFAULT_ADDTIONAL_REGEXES = void 0;
+exports.FULL_TEXT_MATCH = exports.PATTERN_MATCH = exports.HIGH_ENTROPY = exports.DEFAULT_ADDTIONAL_REGEXES = void 0;
 exports.isPlainObject = isPlainObject;
 exports.plainObjectOption = plainObjectOption;
 exports.validateRecordOfRegex = validateRecordOfRegex;
@@ -164,3 +164,4 @@ function getAssignmentName(node) {
 }
 exports.HIGH_ENTROPY = "HIGH_ENTROPY";
 exports.PATTERN_MATCH = "PATTERN_MATCH";
+exports.FULL_TEXT_MATCH = "FULL_TEXT_MATCH";

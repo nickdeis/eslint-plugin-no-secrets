@@ -17,10 +17,10 @@ function globalizeAllRegularExps(patterns) {
         globalizeRegularExpression(pattern),
     ]));
 }
-function parseAndValidateOptions({ additionalPatterns }) {
-    const compiledRegexes = (0, utils_1.validateRecordOfRegex)((0, utils_1.plainObjectOption)(additionalPatterns, "additionalPatterns", utils_1.DEFAULT_ADDTIONAL_REGEXES));
+function parseAndValidateOptions({ patterns }) {
+    const compiledRegexes = (0, utils_1.validateRecordOfRegex)((0, utils_1.plainObjectOption)(patterns, "patterns", utils_1.DEFAULT_ADDTIONAL_REGEXES));
     return {
-        additionalPatterns: compiledRegexes,
+        patterns: compiledRegexes,
     };
 }
 function findAllNewLines(text) {
@@ -76,9 +76,46 @@ function findLineAndColNoFromMatchIdx(startIdx, linesIdx, matchLength) {
     }
     return { endIdx, startIdx, lineSelections };
 }
+function serializeTextSelections(textAreaSelection) {
+    return textAreaSelection.lineSelections
+        .map((line) => {
+        return `${line.lineNo}:${line.startCol}-${line.endCol}`;
+    })
+        .join(",");
+}
+function findStartAndEndTextSelection(textAreaSelection) {
+    const start = {
+        column: Infinity,
+        line: Infinity,
+    };
+    const end = {
+        line: 0,
+        column: 0,
+    };
+    for (const line of textAreaSelection.lineSelections) {
+        const min = Math.min(line.lineNo, start.line);
+        if (line.lineNo === min) {
+            start.line = min;
+            start.column = line.startCol;
+        }
+        const max = Math.max(line.lineNo, end.line);
+        if (line.lineNo === max) {
+            end.line = max;
+            end.column = line.endCol;
+        }
+    }
+    return {
+        start,
+        end,
+    };
+}
+const FULL_TEXT_MATCH_MESSAGE = `Found text that matches the pattern "{{ patternName }}": {{ textMatch }}`;
 const noPatternMatch = {
     meta: {
         schema: false,
+        messages: {
+            [utils_1.FULL_TEXT_MATCH]: FULL_TEXT_MATCH_MESSAGE,
+        },
         docs: {
             description: "An eslint rule that does pattern matching against an entire file",
             category: "Best Practices",
@@ -86,21 +123,30 @@ const noPatternMatch = {
     },
     create(context) {
         var _a;
-        const { additionalPatterns } = parseAndValidateOptions(context.options[0] || {});
+        const { patterns } = parseAndValidateOptions(context.options[0] || {});
         const sourceCode = ((_a = context === null || context === void 0 ? void 0 : context.getSourceCode) === null || _a === void 0 ? void 0 : _a.call(context)) || context.sourceCode;
-        const patterns = Object.entries(additionalPatterns);
+        const patternList = Object.entries(patterns);
         const text = sourceCode.text;
         const newLinePos = findAllNewLines(text);
-        for (const [name, pattern] of patterns) {
+        const matches = patternList
+            .map(([name, pattern]) => {
             const globalPattern = globalizeRegularExpression(pattern);
             const matches = Array.from(text.matchAll(globalPattern));
-            for (const m of matches) {
+            return matches.map((m) => {
                 const idx = m.index;
-                const match = m[0];
-                const meta = findLineAndColNoFromMatchIdx(idx, newLinePos, match.length);
-                //console.dir({ match, meta }, { depth: 3 });
-            }
-        }
+                const textMatch = m[0];
+                const lineAndColNumbers = findLineAndColNoFromMatchIdx(idx, newLinePos, textMatch.length);
+                return { lineAndColNumbers, textMatch, patternName: name };
+            });
+        })
+            .flat();
+        matches.forEach(({ patternName, textMatch, lineAndColNumbers }) => {
+            context.report({
+                data: { patternName, textMatch },
+                messageId: utils_1.FULL_TEXT_MATCH,
+                loc: findStartAndEndTextSelection(lineAndColNumbers),
+            });
+        });
         return {};
     },
 };

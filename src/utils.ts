@@ -207,3 +207,5 @@ function getAssignmentName(node) {
 export const HIGH_ENTROPY = "HIGH_ENTROPY";
 
 export const PATTERN_MATCH = "PATTERN_MATCH";
+
+export const FULL_TEXT_MATCH = "FULL_TEXT_MATCH";
