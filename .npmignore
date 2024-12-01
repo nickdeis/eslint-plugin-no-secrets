@@ -7,3 +7,5 @@ staging/*
 src/*
 tsconfig.json
 v1tov2.md
+CHANGELOG.md
+.DS_Store
