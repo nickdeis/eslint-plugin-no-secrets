@@ -1,12 +1,14 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "1.1.2",
+  "version": "2.1.0",
   "description": "An eslint rule that searches for potential secrets/keys in code",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./index.d.ts",
   "scripts": {
-    "test": "node tests/lib/rules/no-secrets.js && mocha \"staging/**/*.spec.js\"",
-    "test:staging": "mocha \"staging/**/*.spec.js\""
+    "build": "tsc",
+    "test": "npm run test:unit && npm run test:staging",
+    "test:unit": "ts-node tests/lib/rules",
+    "test:staging": "npm run build && node ./staging/staging.spec.js"
   },
   "keywords": [
     "eslint",
@@ -14,7 +16,6 @@
     "security",
     "secure",
     "secrets",
-    "security",
     "lint",
     "eslintplugin"
   ],
@@ -23,19 +24,21 @@
   "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^9.6.1",
+    "@types/node": "^22.9.1",
     "eslint": "^7.19.0",
     "eslint-plugin-jsonc": "^2.15.1",
     "eslint-plugin-self": "^1.2.0",
     "eslint6": "npm:eslint@^6.8.0",
     "eslint8": "npm:eslint@^8.57.0",
     "eslint9": "npm:eslint@^9.0.0",
-    "mocha": "^10.4.0"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   },
   "peerDependencies": {
-    "eslint": ">=3.0.0"
+    "eslint": ">=5"
   },
   "engines": {
-    "npm": ">=6.9.0",
-    "node": ">=10.0.0"
+    "npm": ">=8",
+    "node": ">=18"
   }
 }

@@ -3,3 +3,7 @@ tests/*
 *.log
 staging/*
 .travis.yml
+.github/*
+src/*
+tsconfig.json
+v1tov2.md

@@ -4,6 +4,13 @@
 
 An eslint rule that searches for potential secrets/keys in code and JSON files.
 
+This plugin has two rules:
+
+- `no-secrets`: Find potential secrets using cryptographic entropy or patterns in the AST (acts like a standard eslint rule, more configurable)
+- `no-pattern-match`: Find potential secrets in text (acts like `grep`, less configurable, but potentially more flexible)
+
+---
+
 <!-- vscode-markdown-toc -->
 
 - 1. [Usage](#Usage)
@@ -11,14 +18,17 @@ An eslint rule that searches for potential secrets/keys in code and JSON files.
   - 1.2. [eslintrc](#eslintrc)
   - 1.3. [Include JSON files](#IncludeJSONfiles)
     - 1.3.1. [Include JSON files with in "flat configs"](#IncludeJSONfileswithinflatconfigs)
-- 2. [Config](#Config)
-- 3. [When it's really not a secret](#Whenitsreallynotasecret)
-  - 3.1. [ Either disable it with a comment](#Eitherdisableitwithacomment)
-  - 3.2. [ use the `ignoreContent` to ignore certain content](#usetheignoreContenttoignorecertaincontent)
-  - 3.3. [ Use `ignoreIdentifiers` to ignore certain variable/property names](#UseignoreIdentifierstoignorecertainvariablepropertynames)
-  - 3.4. [ Use `additionalDelimiters` to further split up tokens](#UseadditionalDelimiterstofurthersplituptokens)
-- 4. [Options](#Options)
-- 5. [Acknowledgements](#Acknowledgements)
+- 2. [`no-secrets`](#no-secrets)
+  - 2.1. [`no-secrets` examples](#no-secretsexamples)
+  - 2.2. [When it's really not a secret](#Whenitsreallynotasecret)
+    - 2.2.1. [ Either disable it with a comment](#Eitherdisableitwithacomment)
+    - 2.2.2. [ use the `ignoreContent` to ignore certain content](#usetheignoreContenttoignorecertaincontent)
+    - 2.2.3. [ Use `ignoreIdentifiers` to ignore certain variable/property names](#UseignoreIdentifierstoignorecertainvariablepropertynames)
+    - 2.2.4. [ Use `additionalDelimiters` to further split up tokens](#UseadditionalDelimiterstofurthersplituptokens)
+  - 2.3. [`no-secrets` Options](#no-secretsOptions)
+- 3. [`no-pattern-match`](#no-pattern-match)
+  - 3.1. [`no-pattern-match` options](#no-pattern-matchoptions)
+- 4. [Acknowledgements](#Acknowledgements)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -107,7 +117,16 @@ export default [
 ];
 ```
 
-## 2. <a name='Config'></a>Config
+## 2. <a name='no-secrets'></a>`no-secrets`
+
+`no-secrets` is a rule that does two things:
+
+1. Search for patterns that often contain sensitive information
+2. Measure cryptographic entropy to find potentially leaked secrets/passwords
+
+It's modeled after early [truffleHog](https://github.com/dxa4481/truffleHog), but acts on ECMAscripts AST. This allows closer inspection into areas where secrets are commonly leaked like string templates or comments.
+
+### 2.1. <a name='no-secretsexamples'></a>`no-secrets` examples
 
 Decrease the tolerance for entropy
 
@@ -139,9 +158,9 @@ Standard patterns can be found [here](./regexes.js)
 }
 ```
 
-## 3. <a name='Whenitsreallynotasecret'></a>When it's really not a secret
+### 2.2. <a name='Whenitsreallynotasecret'></a>When it's really not a secret
 
-### 3.1. <a name='Eitherdisableitwithacomment'></a> Either disable it with a comment
+#### 2.2.1. <a name='Eitherdisableitwithacomment'></a> Either disable it with a comment
 
 ```javascript
 // Set of potential base64 characters
@@ -152,7 +171,7 @@ const BASE64_CHARS =
 
 This will tell future maintainers of the codebase that this suspicious string isn't an oversight
 
-### 3.2. <a name='usetheignoreContenttoignorecertaincontent'></a> use the `ignoreContent` to ignore certain content
+#### 2.2.2. <a name='usetheignoreContenttoignorecertaincontent'></a> use the `ignoreContent` to ignore certain content
 
 ```json
 {
@@ -163,7 +182,7 @@ This will tell future maintainers of the codebase that this suspicious string is
 }
 ```
 
-### 3.3. <a name='UseignoreIdentifierstoignorecertainvariablepropertynames'></a> Use `ignoreIdentifiers` to ignore certain variable/property names
+#### 2.2.3. <a name='UseignoreIdentifierstoignorecertainvariablepropertynames'></a> Use `ignoreIdentifiers` to ignore certain variable/property names
 
 ```json
 {
@@ -177,7 +196,7 @@ This will tell future maintainers of the codebase that this suspicious string is
 }
 ```
 
-### 3.4. <a name='UseadditionalDelimiterstofurthersplituptokens'></a> Use `additionalDelimiters` to further split up tokens
+#### 2.2.4. <a name='UseadditionalDelimiterstofurthersplituptokens'></a> Use `additionalDelimiters` to further split up tokens
 
 Tokens will always be split up by whitespace within a string. However, sometimes words that are delimited by something else (e.g. dashes, periods, camelcase words). You can use `additionalDelimiters` to handle these cases.
 
@@ -195,7 +214,7 @@ For example, if you want to split words up by the character `.` and by camelcase
 }
 ```
 
-## 4. <a name='Options'></a>Options
+### 2.3. <a name='no-secretsOptions'></a>`no-secrets` Options
 
 | Option               | Description                                                                                                                                                                            | Default | Type                                        |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------- |
@@ -207,6 +226,41 @@ For example, if you want to split words up by the character `.` and by camelcase
 | ignoreCase           | Ignores character case when calculating entropy. This could lead to some false negatives                                                                                               | `false` | `boolean`                                   |
 | additionalDelimiters | In addition to splitting the string by whitespace, tokens will be further split by these delimiters                                                                                    | `[]`    | (string\|RegExp)[]                          |
 
-## 5. <a name='Acknowledgements'></a>Acknowledgements
+## 3. <a name='no-pattern-match'></a>`no-pattern-match`
+
+While this rule was originally made to take advantage of ESLint's AST, sometimes you may want to see if a pattern matches any text in a file, kinda like `grep`.
+
+For example, if we configure as follows:
+
+```js
+import noSecrets from "eslint-plugin-no-secrets";
+
+//Flat config
+
+export default [
+  {
+    files: ["**/*.js"],
+    plugins: {
+      "no-secrets": noSecret,
+    },
+    rules: {
+      "no-secrets/no-pattern-match": [
+        "error",
+        { patterns: { SecretJS: /const SECRET/, SecretJSON: /\"SECRET\"/ } },
+      ],
+    },
+  },
+];
+```
+
+We would match `const SECRET`, but not `var SECRET`. We would match keys that were called `"SECRET"` in JSON files if they were configured to be scanned.
+
+### 3.1. <a name='no-pattern-matchoptions'></a>`no-pattern-match` options
+
+| Option   | Description                                                       | Default | Type                                        |
+| -------- | ----------------------------------------------------------------- | ------- | ------------------------------------------- |
+| patterns | An object of patterns to check the text contents of files against | `{}`    | {\[regexCheckName:string]:string \| RegExp} |
+
+## 4. <a name='Acknowledgements'></a>Acknowledgements
 
 Huge thanks to [truffleHog](https://github.com/dxa4481/truffleHog) for the inspiration, the regexes, and the measure of entropy.
