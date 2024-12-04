@@ -30,7 +30,7 @@ function shouldIgnore(value, toIgnore) {
 }
 const meta = {
     name: "eslint-plugin-no-secrets",
-    version: "2.1.0",
+    version: "2.1.1",
 };
 exports.meta = meta;
 const noSecrets = {

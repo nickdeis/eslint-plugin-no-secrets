@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "./dist/index.js",
   "types": "./index.d.ts",
