@@ -40,6 +40,7 @@ const FLAT_TESTS = {
   "jsonc-flat.eslintrc.js": JSON_FILES,
   "normal-flat.eslintrc.js": JS_FILES,
   "mixed-flat.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
+  "json-flat.eslintrc.js": JSON_FILES,
 };
 
 async function runTests(tests, eslintClazz) {
@@ -49,7 +50,9 @@ async function runTests(tests, eslintClazz) {
       overrideConfigFile: path.join(__dirname, config),
     });
     const files = tests.map((test) => test.file);
+    console.log(config);
     const results = await eslint.lintFiles(files);
+
     describe(config, () => {
       for (let i = 0; i < tests.length; i++) {
         const test = tests[i];

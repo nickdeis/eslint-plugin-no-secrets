@@ -46,6 +46,7 @@ const noSecrets = {
         },
     },
     create(context) {
+        var _a;
         const { tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers, additionalDelimiters, ignoreCase, } = (0, utils_1.checkOptions)(context.options[0] || {});
         const sourceCode = context.getSourceCode() || context.sourceCode;
         const allPatterns = Object.assign({}, regexes_1.default, additionalRegexes);
@@ -105,9 +106,16 @@ const noSecrets = {
             });
         }
         //Check all comments
-        const comments = sourceCode.getAllComments();
+        const comments = ((_a = sourceCode === null || sourceCode === void 0 ? void 0 : sourceCode.getAllComments) === null || _a === void 0 ? void 0 : _a.call(sourceCode)) || [];
         comments.forEach((comment) => checkString(comment.value, comment));
         return {
+            /**
+             * For the official json
+             */
+            String(node) {
+                const { value } = node;
+                checkString(value, node);
+            },
             Literal(node) {
                 const { value } = node;
                 checkString(value, node);
