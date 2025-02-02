@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2.2.1
+
+### Minor
+
+- Add support for the official ESLint json parser
+
 ## 2.1.0
 
 ### Major

@@ -83,7 +83,7 @@ const AWS_TOKEN = "AKIAIUWUUQQN3GNUA88V";
 
 ### 1.3. <a name='IncludeJSONfiles'></a>Include JSON files
 
-To include JSON files, install `eslint-plugin-jsonc`
+To include JSON files, install `eslint-plugin-jsonc` or `@eslint/json` (if using ESLint version 9.6 or above)
 
 `npm install --save-dev eslint-plugin-jsonc`
 
@@ -93,6 +93,24 @@ Then in your `.eslint` configuration file, extend the jsonc base config
 {
   "extends": ["plugin:jsonc/base"]
 }
+```
+
+or if you are using ESLint 9.6 or above
+
+```typescript
+module.exports = [
+  {
+    plugins: {
+      json,
+      "no-secrets": noSecret,
+    },
+  },
+  {
+    files: ["**/*.json"],
+    language: "json/json",
+    ....
+  },
+];
 ```
 
 #### 1.3.1. <a name='IncludeJSONfileswithinflatconfigs'></a>Include JSON files with in "flat configs"

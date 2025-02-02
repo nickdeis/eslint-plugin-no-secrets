@@ -126,10 +126,17 @@ const noSecrets: Rule.RuleModule = {
     }
 
     //Check all comments
-    const comments = sourceCode.getAllComments();
+    const comments = sourceCode?.getAllComments?.() || [];
     comments.forEach((comment) => checkString(comment.value, comment));
 
     return {
+      /**
+       * For the official eslint json plugin
+       */
+      String(node) {
+        const { value } = node;
+        checkString(value, node);
+      },
       Literal(node) {
         const { value } = node;
         checkString(value, node);
