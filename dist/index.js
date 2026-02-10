@@ -30,7 +30,7 @@ function shouldIgnore(value, toIgnore) {
 }
 const meta = {
     name: "eslint-plugin-no-secrets",
-    version: "2.1.1",
+    version: "2.2.2",
 };
 exports.meta = meta;
 const noSecrets = {
@@ -42,13 +42,12 @@ const noSecrets = {
         },
         docs: {
             description: "An eslint rule that looks for possible leftover secrets in code",
-            category: "Best Practices",
         },
     },
     create(context) {
         var _a;
         const { tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers, additionalDelimiters, ignoreCase, } = (0, utils_1.checkOptions)(context.options[0] || {});
-        const sourceCode = context.getSourceCode() || context.sourceCode;
+        const sourceCode = (0, utils_1.getSourceCode)(context);
         const allPatterns = Object.assign({}, regexes_1.default, additionalRegexes);
         const allDelimiters = additionalDelimiters.concat([" "]);
         function splitIntoTokens(value) {
@@ -110,7 +109,7 @@ const noSecrets = {
         comments.forEach((comment) => checkString(comment.value, comment));
         return {
             /**
-             * For the official json
+             * For the official eslint json plugin
              */
             String(node) {
                 const { value } = node;

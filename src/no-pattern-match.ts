@@ -1,7 +1,8 @@
-import type { Rule } from "eslint";
+import type { Rule } from "eslint10";
 import {
-  DEFAULT_ADDTIONAL_REGEXES,
+  DEFAULT_ADDITIONAL_REGEXES,
   FULL_TEXT_MATCH,
+  getSourceCode,
   plainObjectOption,
   validateRecordOfRegex,
 } from "./utils";
@@ -16,20 +17,9 @@ function globalizeRegularExpression(regexp: RegExp) {
   return new RegExp(regexp, regexp.flags + "g");
 }
 
-function globalizeAllRegularExps(
-  patterns: Record<string, RegExp>
-): Record<string, RegExp> {
-  return Object.fromEntries(
-    Object.entries(patterns).map(([name, pattern]) => [
-      name,
-      globalizeRegularExpression(pattern),
-    ])
-  );
-}
-
 function parseAndValidateOptions({ patterns }) {
   const compiledRegexes = validateRecordOfRegex(
-    plainObjectOption(patterns, "patterns", DEFAULT_ADDTIONAL_REGEXES)
+    plainObjectOption(patterns, "patterns", DEFAULT_ADDITIONAL_REGEXES),
   );
   return {
     patterns: compiledRegexes,
@@ -64,7 +54,7 @@ type TextAreaSelection = {
 function findLineAndColNoFromMatchIdx(
   startIdx: number,
   linesIdx: number[],
-  matchLength: number
+  matchLength: number,
 ): TextAreaSelection {
   const endIdx = startIdx + matchLength;
   const lineSelections: LineTextArea[] = [];
@@ -150,26 +140,25 @@ const noPatternMatch: Rule.RuleModule = {
     docs: {
       description:
         "An eslint rule that does pattern matching against an entire file",
-      category: "Best Practices",
     },
   },
   create(context) {
     const { patterns } = parseAndValidateOptions(context.options[0] || {});
-    const sourceCode = context?.getSourceCode?.() || context.sourceCode;
+    const sourceCode = getSourceCode(context);
     const patternList = Object.entries(patterns);
     const text = sourceCode.text;
     const newLinePos = findAllNewLines(text);
     const matches = patternList
       .map(([name, pattern]) => {
         const globalPattern = globalizeRegularExpression(pattern);
-        const matches = Array.from(text.matchAll(globalPattern));
+        const matches: any[] = Array.from(text.matchAll(globalPattern));
         return matches.map((m) => {
           const idx = m.index;
           const textMatch = m[0];
           const lineAndColNumbers = findLineAndColNoFromMatchIdx(
             idx,
             newLinePos,
-            textMatch.length
+            textMatch.length,
           );
 
           return { lineAndColNumbers, textMatch, patternName: name };

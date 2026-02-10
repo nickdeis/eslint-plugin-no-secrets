@@ -1,3 +1,6 @@
+import { Rule, SourceCode } from "eslint10";
+import { Literal, SimpleLiteral, TemplateElement } from "estree";
+
 const MATH_LOG_2 = Math.log(2);
 /**
  * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters,
@@ -5,10 +8,10 @@ const MATH_LOG_2 = Math.log(2);
  */
 const CHARSET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=!|*^@~`$%+?\"'_<>".split(
-    ""
+    "",
   );
 const DEFAULT_TOLERANCE = 4;
-export const DEFAULT_ADDTIONAL_REGEXES = {};
+export const DEFAULT_ADDITIONAL_REGEXES = {};
 
 type PlainObject = {
   [key: string | number]: any;
@@ -20,14 +23,14 @@ export function isPlainObject(obj: any): obj is PlainObject {
 
 function compileListOfPatterns(
   patterns: string | RegExp | (string | RegExp)[] = [],
-  name?: string
+  name?: string,
 ) {
   if (!Array.isArray(patterns)) {
     if (typeof patterns === "string" || patterns instanceof RegExp) {
       patterns = [patterns];
     } else {
       throw new Error(
-        `Expected '${name}' to be an a array, a string, or a RegExp`
+        `Expected '${name}' to be an a array, a string, or a RegExp`,
       );
     }
   }
@@ -39,16 +42,22 @@ function compileListOfPatterns(
       compiledPatterns[i] =
         pattern instanceof RegExp ? pattern : new RegExp(String(pattern));
     } catch (e) {
-      throw new Error("Failed to compiled the regexp " + patterns[i]);
+      throw new Error(`Failed to compiled the regexp ${patterns[i]}`);
     }
   }
   return compiledPatterns;
 }
 
-function booleanOption(value: any, name: string, defaultValue: any): boolean {
-  //TODO: This is kind of ridiclous check, fix this
+function booleanOption(
+  value: any,
+  name: string,
+  defaultValue: boolean,
+): boolean {
   value = value || defaultValue;
   if (typeof value !== "boolean") {
+    if (typeof value === "undefined") {
+      return defaultValue;
+    }
     throw new Error(`The option '${name}' must be boolean`);
   }
   return value;
@@ -57,7 +66,7 @@ function booleanOption(value: any, name: string, defaultValue: any): boolean {
 export function plainObjectOption(
   value: any,
   name: string,
-  defaultValue: PlainObject
+  defaultValue: PlainObject,
 ) {
   value = value || defaultValue;
   if (!isPlainObject(value)) {
@@ -80,7 +89,7 @@ export function validateRecordOfRegex(recordOfRegex: PlainObject) {
           "Could not compile the regexp " +
             regexName +
             " with the value " +
-            recordOfRegex[regexName]
+            recordOfRegex[regexName],
         );
       }
     }
@@ -102,13 +111,13 @@ export function checkOptions({
   tolerance = tolerance || DEFAULT_TOLERANCE;
   if (typeof tolerance !== "number" || tolerance <= 0) {
     throw new Error(
-      "The option tolerance must be a positive (eg greater than zero) number"
+      "The option tolerance must be a positive (eg greater than zero) number",
     );
   }
   additionalRegexes = plainObjectOption(
     additionalRegexes,
     "additionalRegexes",
-    DEFAULT_ADDTIONAL_REGEXES
+    DEFAULT_ADDITIONAL_REGEXES,
   );
 
   const compiledRegexes = validateRecordOfRegex(additionalRegexes);
@@ -141,13 +150,13 @@ export function shannonEntropy(str: string) {
 }
 
 const MODULE_FUNCTIONS = ["import", "require"];
-
+export type CheckedNode = (TemplateElement | Literal | SimpleLiteral) &
+  Rule.NodeParentExtension;
 /**
  * Used to detect "import()" and "require()"
  * Inspired by https://github.com/benmosher/eslint-plugin-import/blob/45bfe472f38ef790c11efe45ffc59808c67a3f94/src/core/staticRequire.js
- * @param {*} node
  */
-function isStaticImportOrRequire(node): boolean {
+function isStaticImportOrRequire(node: any): boolean {
   return (
     node &&
     node.callee &&
@@ -159,17 +168,17 @@ function isStaticImportOrRequire(node): boolean {
   );
 }
 
-function isImportString(node) {
+function isImportString(node: CheckedNode) {
   return node && node.parent && node.parent.type === "ImportDeclaration";
 }
 
-export function isModulePathString(node) {
+export function isModulePathString(node: CheckedNode) {
   return isStaticImportOrRequire(node.parent) || isImportString(node) || false;
 }
 
 const VARORPROP = ["AssignmentExpression", "Property", "VariableDeclarator"];
 
-function getPropertyName(node) {
+function getPropertyName(node: any) {
   return (
     node.parent.key &&
     node.parent.key.type === "Identifier" &&
@@ -177,7 +186,7 @@ function getPropertyName(node) {
   );
 }
 
-export function getIdentifierName(node): false | string {
+export function getIdentifierName(node: CheckedNode): false | string {
   if (!node || !node.parent) return false;
   switch (node.parent.type) {
     case "VariableDeclarator":
@@ -191,11 +200,11 @@ export function getIdentifierName(node): false | string {
   }
 }
 
-function getVarName(node): string {
+function getVarName(node: any): string {
   return node.parent.id && node.parent.id.name;
 }
 
-function getAssignmentName(node) {
+function getAssignmentName(node: any) {
   return (
     node.parent.left &&
     node.parent.property &&
@@ -209,3 +218,16 @@ export const HIGH_ENTROPY = "HIGH_ENTROPY";
 export const PATTERN_MATCH = "PATTERN_MATCH";
 
 export const FULL_TEXT_MATCH = "FULL_TEXT_MATCH";
+
+/**
+ * Backwards and forward getSourceCode function
+ * @param context
+ * @returns
+ */
+export function getSourceCode(context: Rule.RuleContext): SourceCode {
+  if (context?.sourceCode) {
+    return context.sourceCode;
+  } else {
+    return (context as any).getSourceCode() as SourceCode;
+  }
+}

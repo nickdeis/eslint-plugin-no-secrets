@@ -1,4 +1,4 @@
-import type { Rule, ESLint } from "eslint";
+import type { Rule, ESLint } from "eslint10";
 import {
   getIdentifierName,
   shannonEntropy,
@@ -6,9 +6,12 @@ import {
   HIGH_ENTROPY,
   PATTERN_MATCH,
   isModulePathString,
+  getSourceCode,
+  CheckedNode,
 } from "./utils";
 import STANDARD_PATTERNS from "./regexes";
 import noPatternMatch from "./no-pattern-match";
+import { SimpleLiteral, Node } from "estree";
 
 type Literal = string | number | bigint | boolean | RegExp;
 
@@ -26,8 +29,9 @@ function checkRegexes(value: string, patterns: Record<string, RegExp>) {
     })
     .filter((payload) => !!payload);
 }
+type Pattern = string | RegExp;
 
-function shouldIgnore(value: string, toIgnore) {
+function shouldIgnore(value: string, toIgnore: Pattern[]) {
   for (let i = 0; i < toIgnore.length; i++) {
     if (value.match(toIgnore[i])) return true;
   }
@@ -36,7 +40,7 @@ function shouldIgnore(value: string, toIgnore) {
 
 const meta: ESLint.Plugin["meta"] = {
   name: "eslint-plugin-no-secrets",
-  version: "2.1.1",
+  version: "2.2.2",
 };
 
 const noSecrets: Rule.RuleModule = {
@@ -49,7 +53,6 @@ const noSecrets: Rule.RuleModule = {
     docs: {
       description:
         "An eslint rule that looks for possible leftover secrets in code",
-      category: "Best Practices",
     },
   },
   create(context) {
@@ -62,7 +65,7 @@ const noSecrets: Rule.RuleModule = {
       additionalDelimiters,
       ignoreCase,
     } = checkOptions(context.options[0] || {});
-    const sourceCode = context.getSourceCode() || context.sourceCode;
+    const sourceCode = getSourceCode(context);
 
     const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
 
@@ -92,7 +95,7 @@ const noSecrets: Rule.RuleModule = {
         .filter((payload) => tolerance <= payload.entropy);
     }
 
-    function entropyReport(data, node) {
+    function entropyReport(data, node: Node) {
       //Easier to read numbers
       data.entropy = Math.round(data.entropy * 100) / 100;
       context.report({
@@ -102,14 +105,14 @@ const noSecrets: Rule.RuleModule = {
       });
     }
 
-    function patternReport(data, node) {
+    function patternReport(data, node: Node) {
       context.report({
         node,
         data,
         messageId: PATTERN_MATCH,
       });
     }
-    function checkString(value: Literal, node) {
+    function checkString(value: Literal, node: CheckedNode) {
       const idName = getIdentifierName(node);
       if (idName && shouldIgnore(idName, ignoreIdentifiers)) return;
       if (!isNonEmptyString(value)) return;
@@ -127,13 +130,15 @@ const noSecrets: Rule.RuleModule = {
 
     //Check all comments
     const comments = sourceCode?.getAllComments?.() || [];
-    comments.forEach((comment) => checkString(comment.value, comment));
+    comments.forEach((comment) =>
+      checkString(comment.value, comment as unknown as CheckedNode),
+    );
 
     return {
       /**
        * For the official eslint json plugin
        */
-      String(node) {
+      String(node: SimpleLiteral & Rule.NodeParentExtension) {
         const { value } = node;
         checkString(value, node);
       },
@@ -146,7 +151,7 @@ const noSecrets: Rule.RuleModule = {
         const value = node.value.cooked;
         checkString(value, node);
       },
-      JSONLiteral(node) {
+      JSONLiteral(node: SimpleLiteral & Rule.NodeParentExtension) {
         const { value } = node;
         checkString(value, node);
       },

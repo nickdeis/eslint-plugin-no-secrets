@@ -1,6 +1,9 @@
 const path = require("path");
-const ESLint = require("eslint").ESLint;
+
+const ESLint7 = require("eslint").ESLint;
 const ESLint9 = require("eslint9").ESLint;
+const ESLint8 = require("eslint8").ESLint;
+const ESLint10 = require("eslint10").ESLint;
 const assert = require("assert");
 const { describe, it } = require("node:test");
 
@@ -36,11 +39,18 @@ const TESTS = {
   "mixed.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
 };
 
-const FLAT_TESTS = {
-  "jsonc-flat.eslintrc.js": JSON_FILES,
+/**
+ * JSONC plugin has not been updated to be compat with ESLint 10
+ */
+const ESLINT_10_TESTS = {
   "normal-flat.eslintrc.js": JS_FILES,
-  "mixed-flat.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
   "json-flat.eslintrc.js": JSON_FILES,
+};
+
+const FLAT_TESTS = {
+  ...ESLINT_10_TESTS,
+  "mixed-flat.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
+  "jsonc-flat.eslintrc.js": JSON_FILES,
 };
 
 async function runTests(tests, eslintClazz) {
@@ -61,20 +71,30 @@ async function runTests(tests, eslintClazz) {
           assert.strictEqual(
             test.errorCount,
             report.errorCount,
-            JSON.stringify(report.messages, null, 2)
+            JSON.stringify(report.messages, null, 2),
           );
         });
       }
     });
   }
 }
-
+const LEGACY_LINTERS = [
+  [7, ESLint7],
+  [8, ESLint8],
+];
 describe("Staging tests", async () => {
   describe("JSON compat testing", async () => {
-    await runTests(TESTS, ESLint);
+    for (const [version, Linter] of LEGACY_LINTERS) {
+      describe(`Staging Tests for ESLint ${version}`, async () => {
+        await runTests(TESTS, Linter);
+      });
+    }
   });
 
-  describe("Flat config testing", async () => {
+  describe("Flat config testing for ESLint 9", async () => {
     await runTests(FLAT_TESTS, ESLint9);
+  });
+  describe("ESLint 10 Tests", async () => {
+    await runTests(ESLINT_10_TESTS, ESLint10);
   });
 });

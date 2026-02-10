@@ -11,14 +11,8 @@ function globalizeRegularExpression(regexp) {
         return regexp;
     return new RegExp(regexp, regexp.flags + "g");
 }
-function globalizeAllRegularExps(patterns) {
-    return Object.fromEntries(Object.entries(patterns).map(([name, pattern]) => [
-        name,
-        globalizeRegularExpression(pattern),
-    ]));
-}
 function parseAndValidateOptions({ patterns }) {
-    const compiledRegexes = (0, utils_1.validateRecordOfRegex)((0, utils_1.plainObjectOption)(patterns, "patterns", utils_1.DEFAULT_ADDTIONAL_REGEXES));
+    const compiledRegexes = (0, utils_1.validateRecordOfRegex)((0, utils_1.plainObjectOption)(patterns, "patterns", utils_1.DEFAULT_ADDITIONAL_REGEXES));
     return {
         patterns: compiledRegexes,
     };
@@ -118,13 +112,11 @@ const noPatternMatch = {
         },
         docs: {
             description: "An eslint rule that does pattern matching against an entire file",
-            category: "Best Practices",
         },
     },
     create(context) {
-        var _a;
         const { patterns } = parseAndValidateOptions(context.options[0] || {});
-        const sourceCode = ((_a = context === null || context === void 0 ? void 0 : context.getSourceCode) === null || _a === void 0 ? void 0 : _a.call(context)) || context.sourceCode;
+        const sourceCode = (0, utils_1.getSourceCode)(context);
         const patternList = Object.entries(patterns);
         const text = sourceCode.text;
         const newLinePos = findAllNewLines(text);

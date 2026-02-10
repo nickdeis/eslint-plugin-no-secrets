@@ -2,7 +2,12 @@ import P from "../../../src/regexes";
 import { HIGH_ENTROPY, PATTERN_MATCH } from "../../../src/utils";
 import RULE_TESTERS from "./rule-testers";
 import { rules } from "../../../src/index";
-const noSecrets = rules["no-secrets"];
+import type { RuleTester } from "eslint10";
+type RuleTestRunArgs = Parameters<InstanceType<typeof RuleTester>["run"]>;
+type RuleTestConfig = RuleTestRunArgs[2];
+type RuleDef = RuleTestRunArgs[1];
+
+const noSecrets = rules["no-secrets"] as RuleDef;
 
 const STRING_TEST = `
 const NOT_A_SECRET = "I'm not a secret, I think";
@@ -112,7 +117,7 @@ const IMPORT_TEST_FLAT = {
   languageOptions: { sourceType: "module", ecmaVersion: 7 },
 };
 
-export function createTests(flatConfig = false) {
+export function createTests(flatConfig = false): RuleTestConfig {
   return {
     valid: [
       {
