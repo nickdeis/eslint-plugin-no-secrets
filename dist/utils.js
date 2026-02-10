@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FULL_TEXT_MATCH = exports.PATTERN_MATCH = exports.HIGH_ENTROPY = exports.DEFAULT_ADDTIONAL_REGEXES = void 0;
+exports.FULL_TEXT_MATCH = exports.PATTERN_MATCH = exports.HIGH_ENTROPY = exports.DEFAULT_ADDITIONAL_REGEXES = void 0;
 exports.isPlainObject = isPlainObject;
 exports.plainObjectOption = plainObjectOption;
 exports.validateRecordOfRegex = validateRecordOfRegex;
@@ -8,6 +8,7 @@ exports.checkOptions = checkOptions;
 exports.shannonEntropy = shannonEntropy;
 exports.isModulePathString = isModulePathString;
 exports.getIdentifierName = getIdentifierName;
+exports.getSourceCode = getSourceCode;
 const MATH_LOG_2 = Math.log(2);
 /**
  * Charset especially designed to ignore common regular expressions (eg [] and {}), imports/requires (/.), and css classes (-), and other special characters,
@@ -15,7 +16,7 @@ const MATH_LOG_2 = Math.log(2);
  */
 const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+=!|*^@~`$%+?\"'_<>".split("");
 const DEFAULT_TOLERANCE = 4;
-exports.DEFAULT_ADDTIONAL_REGEXES = {};
+exports.DEFAULT_ADDITIONAL_REGEXES = {};
 function isPlainObject(obj) {
     return typeof obj === "object" && obj.constructor === Object;
 }
@@ -36,15 +37,17 @@ function compileListOfPatterns(patterns = [], name) {
                 pattern instanceof RegExp ? pattern : new RegExp(String(pattern));
         }
         catch (e) {
-            throw new Error("Failed to compiled the regexp " + patterns[i]);
+            throw new Error(`Failed to compiled the regexp ${patterns[i]}`);
         }
     }
     return compiledPatterns;
 }
 function booleanOption(value, name, defaultValue) {
-    //TODO: This is kind of ridiclous check, fix this
     value = value || defaultValue;
     if (typeof value !== "boolean") {
+        if (typeof value === "undefined") {
+            return defaultValue;
+        }
         throw new Error(`The option '${name}' must be boolean`);
     }
     return value;
@@ -83,7 +86,7 @@ function checkOptions({ tolerance, additionalRegexes, ignoreContent, ignoreModul
     if (typeof tolerance !== "number" || tolerance <= 0) {
         throw new Error("The option tolerance must be a positive (eg greater than zero) number");
     }
-    additionalRegexes = plainObjectOption(additionalRegexes, "additionalRegexes", exports.DEFAULT_ADDTIONAL_REGEXES);
+    additionalRegexes = plainObjectOption(additionalRegexes, "additionalRegexes", exports.DEFAULT_ADDITIONAL_REGEXES);
     const compiledRegexes = validateRecordOfRegex(additionalRegexes);
     return {
         tolerance,
@@ -116,7 +119,6 @@ const MODULE_FUNCTIONS = ["import", "require"];
 /**
  * Used to detect "import()" and "require()"
  * Inspired by https://github.com/benmosher/eslint-plugin-import/blob/45bfe472f38ef790c11efe45ffc59808c67a3f94/src/core/staticRequire.js
- * @param {*} node
  */
 function isStaticImportOrRequire(node) {
     return (node &&
@@ -165,3 +167,16 @@ function getAssignmentName(node) {
 exports.HIGH_ENTROPY = "HIGH_ENTROPY";
 exports.PATTERN_MATCH = "PATTERN_MATCH";
 exports.FULL_TEXT_MATCH = "FULL_TEXT_MATCH";
+/**
+ * Backwards and forward getSourceCode function
+ * @param context
+ * @returns
+ */
+function getSourceCode(context) {
+    if (context === null || context === void 0 ? void 0 : context.sourceCode) {
+        return context.sourceCode;
+    }
+    else {
+        return context.getSourceCode();
+    }
+}
