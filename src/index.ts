@@ -42,7 +42,7 @@ function shouldIgnore(value: string, toIgnore: Pattern[]) {
 
 const meta: ESLint.Plugin["meta"] = {
   name: "eslint-plugin-no-secrets",
-  version: "2.3.2",
+  version: "2.3.3",
 };
 
 const noSecrets: Rule.RuleModule = {
