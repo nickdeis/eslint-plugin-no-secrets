@@ -12,6 +12,8 @@ import {
 import STANDARD_PATTERNS from "./regexes";
 import noPatternMatch from "./no-pattern-match";
 import { SimpleLiteral, Node } from "estree";
+import schema from "./no-secrets.schema.json";
+import type { JSONSchema4 } from "json-schema";
 
 type Literal = string | number | bigint | boolean | RegExp;
 
@@ -40,12 +42,12 @@ function shouldIgnore(value: string, toIgnore: Pattern[]) {
 
 const meta: ESLint.Plugin["meta"] = {
   name: "eslint-plugin-no-secrets",
-  version: "2.2.2",
+  version: "2.3.2",
 };
 
 const noSecrets: Rule.RuleModule = {
   meta: {
-    schema: false,
+    schema: schema as JSONSchema4,
     messages: {
       [HIGH_ENTROPY]: `Found a string with entropy {{ entropy }} : "{{ token }}"`,
       [PATTERN_MATCH]: `Found a string that matches "{{ name }}" : "{{ match }}"`,

@@ -2,4 +2,3 @@
 *.log
 .vs/
 .DS_Store
-tools/

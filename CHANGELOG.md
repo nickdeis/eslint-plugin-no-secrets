@@ -2,6 +2,8 @@
 
 ## 2.2.2
 
+### Minor
+
 - Added support for ESLint 10
 
 ## 2.2.1

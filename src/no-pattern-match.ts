@@ -6,6 +6,8 @@ import {
   plainObjectOption,
   validateRecordOfRegex,
 } from "./utils";
+import type { JSONSchema4 } from "json-schema";
+import schema from "./no-pattern-match.schema.json";
 
 /**
  * Adds a global flag to a regular expression, useful for using matchAll or just doing multiple matches
@@ -133,7 +135,7 @@ const FULL_TEXT_MATCH_MESSAGE = `Found text that matches the pattern "{{ pattern
 
 const noPatternMatch: Rule.RuleModule = {
   meta: {
-    schema: false,
+    schema: schema as JSONSchema4,
     messages: {
       [FULL_TEXT_MATCH]: FULL_TEXT_MATCH_MESSAGE,
     },
