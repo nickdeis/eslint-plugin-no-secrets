@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build:schema": "node ./tools/json-schema.mts",
+    "build": "npm run build:schema && tsc",
     "test": "npm run test:unit && npm run test:staging",
     "test:unit": "ts-node tests/lib/rules",
     "test:staging": "npm run build && node --test --require ts-node/register ./staging/**.spec.ts"
