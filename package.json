@@ -1,14 +1,15 @@
 {
   "name": "eslint-plugin-no-secrets",
-  "version": "2.2.2",
+  "version": "2.3.3",
   "description": "An eslint rule that searches for potential secrets/keys in code",
   "main": "./dist/index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build:schema": "node --require ts-node/register ./tools/json-schema.ts",
+    "build": "npm run build:schema && tsc",
     "test": "npm run test:unit && npm run test:staging",
     "test:unit": "ts-node tests/lib/rules",
-    "test:staging": "npm run build && node ./staging/staging.spec.js"
+    "test:staging": "npm run build && node --test --require ts-node/register ./staging/**.spec.ts"
   },
   "keywords": [
     "eslint",

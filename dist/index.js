@@ -7,6 +7,7 @@ exports.rules = exports.meta = void 0;
 const utils_1 = require("./utils");
 const regexes_1 = __importDefault(require("./regexes"));
 const no_pattern_match_1 = __importDefault(require("./no-pattern-match"));
+const no_secrets_schema_json_1 = __importDefault(require("./no-secrets.schema.json"));
 function isNonEmptyString(value) {
     return !!(value && typeof value === "string");
 }
@@ -30,12 +31,12 @@ function shouldIgnore(value, toIgnore) {
 }
 const meta = {
     name: "eslint-plugin-no-secrets",
-    version: "2.2.2",
+    version: "2.3.3",
 };
 exports.meta = meta;
 const noSecrets = {
     meta: {
-        schema: false,
+        schema: no_secrets_schema_json_1.default,
         messages: {
             [utils_1.HIGH_ENTROPY]: `Found a string with entropy {{ entropy }} : "{{ token }}"`,
             [utils_1.PATTERN_MATCH]: `Found a string that matches "{{ name }}" : "{{ match }}"`,
@@ -48,7 +49,7 @@ const noSecrets = {
         var _a;
         const { tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers, additionalDelimiters, ignoreCase, } = (0, utils_1.checkOptions)(context.options[0] || {});
         const sourceCode = (0, utils_1.getSourceCode)(context);
-        const allPatterns = Object.assign({}, regexes_1.default, additionalRegexes);
+        const allPatterns = Object.assign(Object.assign({}, regexes_1.default), additionalRegexes);
         const allDelimiters = additionalDelimiters.concat([" "]);
         function splitIntoTokens(value) {
             let tokens = [value];

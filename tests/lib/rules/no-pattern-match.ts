@@ -35,6 +35,10 @@ function createTests(_flatConfig = false) {
           },
         ],
       },
+      {
+        code: ``,
+        options: [{ patterns: { Test: /valid/ } }],
+      },
     ],
     invalid: [
       {

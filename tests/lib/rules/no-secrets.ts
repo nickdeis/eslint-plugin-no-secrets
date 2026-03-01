@@ -117,9 +117,15 @@ const IMPORT_TEST_FLAT = {
   languageOptions: { sourceType: "module", ecmaVersion: 7 },
 };
 
+const SCHEMA_VALIDATION_TESTS = [];
+
 export function createTests(flatConfig = false): RuleTestConfig {
   return {
     valid: [
+      {
+        code: ``,
+        options: [{ tolerance: 5 }],
+      },
       {
         code: STRING_TEST,
         options: [],

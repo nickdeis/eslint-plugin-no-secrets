@@ -1,6 +1,18 @@
 # CHANGELOG
 
+## 2.3.3
+
+### Minor
+
+- Added proper schemas to rules
+
+### Patch
+
+- Security updates
+
 ## 2.2.2
+
+### Minor
 
 - Added support for ESLint 10
 

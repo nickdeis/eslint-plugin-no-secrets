@@ -1,6 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
+const no_pattern_match_schema_json_1 = __importDefault(require("./no-pattern-match.schema.json"));
 /**
  * Adds a global flag to a regular expression, useful for using matchAll or just doing multiple matches
  * @param regexp
@@ -106,7 +110,7 @@ function findStartAndEndTextSelection(textAreaSelection) {
 const FULL_TEXT_MATCH_MESSAGE = `Found text that matches the pattern "{{ patternName }}": {{ textMatch }}`;
 const noPatternMatch = {
     meta: {
-        schema: false,
+        schema: no_pattern_match_schema_json_1.default,
         messages: {
             [utils_1.FULL_TEXT_MATCH]: FULL_TEXT_MATCH_MESSAGE,
         },
