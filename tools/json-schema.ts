@@ -76,7 +76,7 @@ const NoPatternSchema = z
   )
   .optional();
 
-const basePath = path.join(import.meta.dirname, "..", "src");
+const basePath = path.join(__dirname, "..", "src");
 
 function writeSchema(Schema: z.ZodOptional<any>, outFileName: string) {
   let schema = Schema.toJSONSchema({ target: "draft-04" });

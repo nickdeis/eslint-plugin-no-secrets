@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./index.d.ts",
   "scripts": {
-    "build:schema": "node ./tools/json-schema.mts",
+    "build:schema": "node --require ts-node/register ./tools/json-schema.ts",
     "build": "npm run build:schema && tsc",
     "test": "npm run test:unit && npm run test:staging",
     "test:unit": "ts-node tests/lib/rules",
