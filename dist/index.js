@@ -31,7 +31,7 @@ function shouldIgnore(value, toIgnore) {
 }
 const meta = {
     name: "eslint-plugin-no-secrets",
-    version: "2.3.2",
+    version: "2.3.3",
 };
 exports.meta = meta;
 const noSecrets = {
@@ -49,7 +49,7 @@ const noSecrets = {
         var _a;
         const { tolerance, additionalRegexes, ignoreContent, ignoreModules, ignoreIdentifiers, additionalDelimiters, ignoreCase, } = (0, utils_1.checkOptions)(context.options[0] || {});
         const sourceCode = (0, utils_1.getSourceCode)(context);
-        const allPatterns = Object.assign({}, regexes_1.default, additionalRegexes);
+        const allPatterns = Object.assign(Object.assign({}, regexes_1.default), additionalRegexes);
         const allDelimiters = additionalDelimiters.concat([" "]);
         function splitIntoTokens(value) {
             let tokens = [value];

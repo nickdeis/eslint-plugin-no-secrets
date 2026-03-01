@@ -1,13 +1,22 @@
-const path = require("path");
+import path from "path";
 
-const ESLint7 = require("eslint").ESLint;
-const ESLint9 = require("eslint9").ESLint;
-const ESLint8 = require("eslint8").ESLint;
-const ESLint10 = require("eslint10").ESLint;
-const assert = require("assert");
-const { describe, it } = require("node:test");
+import assert from "assert";
+import { describe, it } from "node:test";
+import type { PathLike } from "fs";
+import {
+  ESLint10,
+  ESLint9,
+  type ESLintClass,
+  LEGACY_LINTERS,
+} from "./test-linters";
 
-const JSON_FILES = [
+type StagingTest = {
+  name: string;
+  file: PathLike;
+  errorCount: number;
+};
+
+const JSON_FILES: StagingTest[] = [
   {
     name: "Should not detect non-secrets",
     file: "./staging/has-no-secret.json",
@@ -20,7 +29,7 @@ const JSON_FILES = [
   },
 ];
 
-const JS_FILES = [
+const JS_FILES: StagingTest[] = [
   {
     name: "Should not detect non-secrets",
     file: "./staging/has-no-secret.js",
@@ -33,35 +42,36 @@ const JS_FILES = [
   },
 ];
 
-const TESTS = {
+type StagingTestSuite = Record<string, StagingTest[]>;
+
+const TESTS: StagingTestSuite = {
   "jsonc.eslintrc.js": JSON_FILES,
   "normal.eslintrc.js": JS_FILES,
-  "mixed.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
+  "mixed.eslintrc.js": JSON_FILES.concat(JS_FILES),
 };
 
 /**
  * JSONC plugin has not been updated to be compat with ESLint 10
  */
-const ESLINT_10_TESTS = {
+const ESLINT_10_TESTS: StagingTestSuite = {
   "normal-flat.eslintrc.js": JS_FILES,
   "json-flat.eslintrc.js": JSON_FILES,
 };
 
-const FLAT_TESTS = {
+const FLAT_TESTS: StagingTestSuite = {
   ...ESLINT_10_TESTS,
-  "mixed-flat.eslintrc.js": [].concat(JSON_FILES).concat(JS_FILES),
+  "mixed-flat.eslintrc.js": JSON_FILES.concat(JS_FILES),
   "jsonc-flat.eslintrc.js": JSON_FILES,
 };
 
-async function runTests(tests, eslintClazz) {
+async function runTests(tests: StagingTestSuite, eslintClazz: ESLintClass) {
   const configs = Object.entries(tests);
   for (const [config, tests] of configs) {
     const eslint = new eslintClazz({
       overrideConfigFile: path.join(__dirname, config),
     });
     const files = tests.map((test) => test.file);
-    console.log(config);
-    const results = await eslint.lintFiles(files);
+    const results = await eslint.lintFiles(files as string[]);
 
     describe(config, () => {
       for (let i = 0; i < tests.length; i++) {
@@ -78,10 +88,7 @@ async function runTests(tests, eslintClazz) {
     });
   }
 }
-const LEGACY_LINTERS = [
-  [7, ESLint7],
-  [8, ESLint8],
-];
+
 describe("Staging tests", async () => {
   describe("JSON compat testing", async () => {
     for (const [version, Linter] of LEGACY_LINTERS) {

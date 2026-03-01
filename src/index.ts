@@ -69,7 +69,7 @@ const noSecrets: Rule.RuleModule = {
     } = checkOptions(context.options[0] || {});
     const sourceCode = getSourceCode(context);
 
-    const allPatterns = Object.assign({}, STANDARD_PATTERNS, additionalRegexes);
+    const allPatterns = { ...STANDARD_PATTERNS, ...additionalRegexes };
 
     const allDelimiters: (string | RegExp)[] = (
       additionalDelimiters as (string | RegExp)[]
